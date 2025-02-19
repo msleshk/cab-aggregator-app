@@ -3,7 +3,10 @@ package com.example.passengerservice.controller;
 import com.example.passengerservice.dto.PassengerRequest;
 import com.example.passengerservice.dto.PassengerResponse;
 import com.example.passengerservice.service.PassengerService;
+import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +21,10 @@ public class PassengerController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> addPassenger(@RequestBody PassengerRequest passengerRequest) {
+    public ResponseEntity<Void> addPassenger(@RequestBody @Valid PassengerRequest passengerRequest, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()){
+            throw new ValidationException(bindingResult.getAllErrors().toString());
+        }
         passengerService.addPassenger(passengerRequest);
         return ResponseEntity.ok().build();
     }
@@ -30,7 +36,10 @@ public class PassengerController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> updatePassenger(@PathVariable("id") Long id, @RequestBody PassengerRequest passengerRequest) {
+    public ResponseEntity<Void> updatePassenger(@PathVariable("id") Long id, @RequestBody @Valid PassengerRequest passengerRequest, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()){
+            throw new ValidationException(bindingResult.getAllErrors().toString());
+        }
         passengerService.updatePassenger(id, passengerRequest);
         return ResponseEntity.ok().build();
     }
