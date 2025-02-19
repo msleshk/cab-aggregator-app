@@ -2,6 +2,14 @@ package com.example.passengerservice.repository;
 
 import com.example.passengerservice.model.Passenger;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface PassengerRepository  extends JpaRepository<Passenger, Long> {
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface PassengerRepository extends JpaRepository<Passenger, Long> {
+    Optional<Passenger> findByIdAndDeletedFalse(Long id);
+
+    List<Passenger> findAllByDeletedFalse();
 }

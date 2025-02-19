@@ -1,6 +1,8 @@
 package com.example.passengerservice.service.implementation;
+
 import com.example.passengerservice.dto.PassengerRequest;
 import com.example.passengerservice.dto.PassengerResponse;
+import com.example.passengerservice.exception.PassengerNotFoundException;
 import com.example.passengerservice.model.Passenger;
 import com.example.passengerservice.repository.PassengerRepository;
 import com.example.passengerservice.service.PassengerService;
@@ -25,7 +27,7 @@ public class PassengerServiceImpl implements PassengerService {
 
     @Override
     @Transactional
-    public void createPassenger(PassengerRequest dto) {
+    public void addPassenger(PassengerRequest dto) {
         Passenger passenger = passengerMapper.toEntity(dto);
         passengerRepository.save(passenger);
     }
@@ -33,28 +35,29 @@ public class PassengerServiceImpl implements PassengerService {
     @Override
     @Transactional
     public void updatePassenger(Long id, PassengerRequest dto) {
-        Passenger passengerToUpdate = passengerRepository.findById(id).orElseThrow(); //TODO Add custom exception
+        Passenger passengerToUpdate = passengerRepository.findById(id).orElseThrow(() -> new PassengerNotFoundException("No such passenger!"));
         passengerToUpdate.setName(dto.getName());
         passengerToUpdate.setEmail(dto.getEmail());
-        passengerToUpdate.setPhoneNumber(dto.getPhone());
-
+        passengerToUpdate.setPhoneNumber(dto.getPhoneNumber());
         passengerRepository.save(passengerToUpdate);
     }
 
     @Override
     @Transactional
     public void deletePassengerById(Long id) {
-        passengerRepository.deleteById(id);
+        Passenger passenger = passengerRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new PassengerNotFoundException("No such passenger!"));
+        passenger.setDeleted(true);
+        passengerRepository.save(passenger);
     }
 
     @Override
     public PassengerResponse getPassengerById(Long id) {
-        return passengerMapper.toDto(passengerRepository.findById(id).orElseThrow());
+        return passengerMapper.toDto(passengerRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new PassengerNotFoundException("No such passenger!")));
     }
 
     @Override
     public List<PassengerResponse> getAllPassengers() {
-        return passengerRepository.findAll()
+        return passengerRepository.findAllByDeletedFalse()
                 .stream().map(passengerMapper::toDto)
                 .collect(Collectors.toList());
     }
