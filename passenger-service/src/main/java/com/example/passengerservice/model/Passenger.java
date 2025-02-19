@@ -25,5 +25,5 @@ public class Passenger {
     private String phoneNumber;
 
     @Column(name = "is_deleted")
-    private boolean isDeleted;
+    private boolean deleted;
 }
