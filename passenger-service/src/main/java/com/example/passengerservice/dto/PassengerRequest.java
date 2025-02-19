@@ -19,6 +19,6 @@ public class PassengerRequest {
     @Email(message = "Email should be correct!")
     private String email;
     @NotEmpty(message = "Phone number should not be empty!")
-    @Pattern(regexp = "^\\+\\d{3}\\(\\d{2}\\)\\d{3}-\\d{2}-\\d{2}$\n", message = "Phone number should follow pattern: +000(00)000-00-00!")
+    @Pattern(regexp = "\\+\\d{3}\\(\\d{2}\\)\\d{3}-\\d{2}-\\d{2}", message = "Phone number should follow pattern: +000(00)000-00-00!")
     private String phoneNumber;
 }

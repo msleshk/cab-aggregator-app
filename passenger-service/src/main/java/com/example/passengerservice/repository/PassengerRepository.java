@@ -12,4 +12,8 @@ public interface PassengerRepository extends JpaRepository<Passenger, Long> {
     Optional<Passenger> findByIdAndDeletedFalse(Long id);
 
     List<Passenger> findAllByDeletedFalse();
+
+    Optional<Passenger> findPassengerByEmailAndDeletedFalse(String email);
+
+    Optional<Passenger> findPassengerByPhoneNumberAndDeletedFalse(String phone);
 }
