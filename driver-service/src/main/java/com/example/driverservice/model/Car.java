@@ -27,5 +27,5 @@ public class Car {
     @OneToOne(mappedBy = "car")
     private Driver driver;
     @Column(name = "is_deleted")
-    private Boolean deleted;
+    private Boolean deleted = false;
 }
