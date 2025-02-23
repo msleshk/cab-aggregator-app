@@ -10,6 +10,8 @@ import java.util.Optional;
 @Repository
 public interface CarRepository extends JpaRepository<Car, Long> {
     Optional<Car> findCarByCarNumberAndDeletedFalse(String carNumber);
+
     Optional<Car> findCarByIdAndDeletedFalse(Long id);
+
     List<Car> findAllByDeletedFalse();
 }
