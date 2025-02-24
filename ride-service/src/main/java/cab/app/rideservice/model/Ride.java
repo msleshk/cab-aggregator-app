@@ -28,10 +28,16 @@ public class Ride {
     private String departureAddress;
     @Column(name = "arrival_address")
     private String arrivalAddress;
+    @Column(name = "distance")
+    private BigDecimal distance;
     @Column(name = "status")
     private RideStatus status;
     @Column(name = "order_date_time")
     private LocalDateTime orderDateTime;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
     @Column(name = "cost")
     private BigDecimal cost;
+    @Column(name = "is_deleted")
+    private Boolean deleted = false;
 }
