@@ -2,9 +2,12 @@ package cab.app.rideservice.controller;
 
 import cab.app.rideservice.dto.request.RideRequest;
 import cab.app.rideservice.dto.response.RideResponse;
+import cab.app.rideservice.exception.ValidationException;
 import cab.app.rideservice.service.RideService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,13 +22,19 @@ public class RideController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createRide(@RequestBody RideRequest rideRequest){
+    public ResponseEntity<Void> createRide(@RequestBody @Valid RideRequest rideRequest, BindingResult bindingResult){
+        if (bindingResult.hasErrors()){
+            throw new ValidationException(bindingResult.getAllErrors().toString());
+        }
         rideService.createRide(rideRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> updateRide(@PathVariable("id") Long rideId, @RequestBody RideRequest rideRequest){
+    public ResponseEntity<Void> updateRide(@PathVariable("id") Long rideId, @RequestBody @Valid RideRequest rideRequest, BindingResult bindingResult){
+        if (bindingResult.hasErrors()){
+            throw new ValidationException(bindingResult.getAllErrors().toString());
+        }
         rideService.updateRide(rideId, rideRequest);
         return ResponseEntity.ok().build();
     }
