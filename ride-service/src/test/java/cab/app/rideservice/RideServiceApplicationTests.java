@@ -1,13 +1,13 @@
-package com.example.ridesservice;
+package cab.app.rideservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class RidesServiceApplicationTests {
+class RideServiceApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }
