@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: classpath:/db/changelog/changeset/V1_create_cars_table.yml
+  - include:
+      file: classpath:/db/changelog/changeset/V1_create_drivers_table.yml

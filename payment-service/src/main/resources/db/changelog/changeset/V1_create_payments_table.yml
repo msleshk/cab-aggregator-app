@@ -1,0 +1,51 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: Maksim Leshko
+      changes:
+        - createTable:
+            tableName: payments
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: ride_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: passenger_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: driver_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cost
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: final_cost
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
