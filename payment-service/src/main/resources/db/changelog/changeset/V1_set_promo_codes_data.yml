@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: 5
+      author: Maksim Leshko
+      changes:
+        - insert:
+            tableName: promo_codes
+            columns:
+              - column:
+                  name: code
+                  value: "WELCOME10"
+              - column:
+                  name: discount_amount
+                  value: 10.00
+              - column:
+                  name: is_active
+                  valueBoolean: true
+        - insert:
+            tableName: promo_codes
+            columns:
+              - column:
+                  name: code
+                  value: "RIDE50"
+              - column:
+                  name: discount_amount
+                  value: 50.00
+              - column:
+                  name: is_active
+                  valueBoolean: true
+        - insert:
+            tableName: promo_codes
+            columns:
+              - column:
+                  name: code
+                  value: "SUMMER25"
+              - column:
+                  name: discount_amount
+                  value: 25.00
+              - column:
+                  name: is_active
+                  valueBoolean: false
