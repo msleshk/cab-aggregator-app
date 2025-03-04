@@ -1,4 +1,4 @@
-package com.example.driverservice.dto.car;
+package com.example.driverservice.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

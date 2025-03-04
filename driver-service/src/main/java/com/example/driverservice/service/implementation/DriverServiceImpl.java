@@ -1,7 +1,8 @@
 package com.example.driverservice.service.implementation;
 
-import com.example.driverservice.dto.driver.DriverRequest;
-import com.example.driverservice.dto.driver.DriverResponse;
+import com.example.driverservice.dto.response.ResponseList;
+import com.example.driverservice.dto.request.DriverRequest;
+import com.example.driverservice.dto.response.DriverResponse;
 import com.example.driverservice.exception.EntityNotFoundException;
 import com.example.driverservice.exception.ResourceAlreadyTakenException;
 import com.example.driverservice.model.Car;
@@ -10,24 +11,20 @@ import com.example.driverservice.repository.CarRepository;
 import com.example.driverservice.repository.DriverRepository;
 import com.example.driverservice.service.DriverService;
 import com.example.driverservice.util.DriverMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class DriverServiceImpl implements DriverService {
     private final DriverRepository driverRepository;
     private final CarRepository carRepository;
     private final DriverMapper driverMapper;
-
-    public DriverServiceImpl(DriverRepository driverRepository, CarRepository carRepository, DriverMapper driverMapper) {
-        this.driverRepository = driverRepository;
-        this.carRepository = carRepository;
-        this.driverMapper = driverMapper;
-    }
 
     @Override
     @Transactional
@@ -42,8 +39,7 @@ public class DriverServiceImpl implements DriverService {
     @Override
     @Transactional
     public void deleteDriver(Long id) {
-        Driver driver = driverRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new EntityNotFoundException("Driver with this id not found!"));
+        Driver driver = findDriverById(id);
         driver.setCar(null);
         driver.setDeleted(true);
         driverRepository.save(driver);
@@ -52,34 +48,46 @@ public class DriverServiceImpl implements DriverService {
     @Override
     @Transactional
     public void updateDriver(Long id, DriverRequest driverDto) {
-        Driver driverToUpdate = driverRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new EntityNotFoundException("Driver with this id not found!"));
+        Driver driverToUpdate = findDriverById(id);
+
+        updateIfChanged(driverToUpdate, driverDto);
+
+        driverToUpdate.setName(driverDto.getName());
+        driverToUpdate.setEmail(driverDto.getEmail());
+        driverToUpdate.setPhoneNumber(driverDto.getPhoneNumber());
+        driverToUpdate.setGender(driverDto.getGender());
+
+        driverRepository.save(driverToUpdate);
+    }
+
+    @Override
+    public ResponseList<DriverResponse> getAllDrivers(int offset, int limit) {
+        return new ResponseList<>(
+                driverRepository.findAllByDeletedFalse(PageRequest.of(offset, limit))
+                        .getContent().stream()
+                        .map(driverMapper::toDto)
+                        .collect(Collectors.toList())
+        );
+    }
+
+    @Override
+    public DriverResponse getDriverById(Long id) {
+        return driverMapper.toDto(findDriverById(id));
+    }
+
+    private void updateIfChanged(Driver driverToUpdate, DriverRequest driverDto){
         if (!driverToUpdate.getEmail().equals(driverDto.getEmail())) {
             checkIfEmailUnique(driverDto.getEmail());
         }
         if (!driverToUpdate.getPhoneNumber().equals(driverDto.getPhoneNumber())) {
             checkIfPhoneUnique(driverDto.getPhoneNumber());
         }
-        checkIfCarTaken(driverDto.getCarId());
-
-        driverToUpdate.setName(driverDto.getName());
-        driverToUpdate.setEmail(driverDto.getEmail());
-        driverToUpdate.setPhoneNumber(driverDto.getPhoneNumber());
-        driverToUpdate.setGender(driverDto.getGender());
-        driverToUpdate.setCar(findCarById(driverDto.getCarId()));
-    }
-
-    @Override
-    public List<DriverResponse> getAllDrivers() {
-        return driverRepository.findAllByDeletedFalse().stream()
-                .map(driverMapper::toDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public DriverResponse getDriverById(Long id) {
-        return driverRepository.findByIdAndDeletedFalse(id).map(driverMapper::toDto)
-                .orElseThrow(() -> new EntityNotFoundException("Driver with this id not found!"));
+        if (driverDto.getCarId() == null) {
+            driverToUpdate.setCar(null);
+        } else {
+            checkIfCarTaken(driverDto.getCarId());
+            driverToUpdate.setCar(findCarById(driverDto.getCarId()));
+        }
     }
 
     private void checkIfDriverUnique(DriverRequest driverRequest) {
@@ -102,6 +110,11 @@ public class DriverServiceImpl implements DriverService {
     private Car findCarById(Long carId) {
         return carRepository.findCarByIdAndDeletedFalse(carId)
                 .orElseThrow(() -> new EntityNotFoundException("Car with this id not found!"));
+    }
+
+    private Driver findDriverById(Long driverId) {
+        return driverRepository.findByIdAndDeletedFalse(driverId)
+                .orElseThrow(() -> new EntityNotFoundException("Driver with this id not found!"));
     }
 
     private void checkIfCarTaken(Long carId) {

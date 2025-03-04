@@ -1,7 +1,7 @@
 package com.example.driverservice.util;
 
-import com.example.driverservice.dto.car.CarRequest;
-import com.example.driverservice.dto.car.CarResponse;
+import com.example.driverservice.dto.request.CarRequest;
+import com.example.driverservice.dto.response.CarResponse;
 import com.example.driverservice.model.Car;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

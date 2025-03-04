@@ -1,7 +1,8 @@
 package com.example.driverservice.service.implementation;
 
-import com.example.driverservice.dto.car.CarRequest;
-import com.example.driverservice.dto.car.CarResponse;
+import com.example.driverservice.dto.response.ResponseList;
+import com.example.driverservice.dto.request.CarRequest;
+import com.example.driverservice.dto.response.CarResponse;
 import com.example.driverservice.exception.EntityNotFoundException;
 import com.example.driverservice.exception.ResourceAlreadyTakenException;
 import com.example.driverservice.model.Car;
@@ -10,25 +11,22 @@ import com.example.driverservice.repository.CarRepository;
 import com.example.driverservice.repository.DriverRepository;
 import com.example.driverservice.service.CarService;
 import com.example.driverservice.util.CarMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class CarServiceImpl implements CarService {
 
     private final CarRepository carRepository;
     private final DriverRepository driverRepository;
     private final CarMapper carMapper;
-
-    public CarServiceImpl(CarRepository carRepository, DriverRepository driverRepository, CarMapper carMapper) {
-        this.carRepository = carRepository;
-        this.driverRepository = driverRepository;
-        this.carMapper = carMapper;
-    }
 
     @Override
     @Transactional
@@ -40,24 +38,23 @@ public class CarServiceImpl implements CarService {
     @Override
     @Transactional
     public void deleteCar(Long id) {
-        Car carToDelete = carRepository.findCarByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new EntityNotFoundException("Car with this id not found!"));
+        Car carToDelete = findCarById(id);
         if (carToDelete.getDriver() != null) {
             Driver driver = carToDelete.getDriver();
             driver.setCar(null);
             driverRepository.save(driver);
-        }        carToDelete.setDeleted(true);
+        }
+        carToDelete.setDeleted(true);
         carRepository.save(carToDelete);
     }
 
     @Override
     @Transactional
     public void updateCar(Long id, CarRequest carDto) {
-        Car carToUpdate = carRepository.findCarByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new EntityNotFoundException("Car with this id not found!"));
-        if (!carToUpdate.getCarNumber().equals(carDto.getCarNumber())) {
-            checkIfCarUnique(carDto);
-        }
+        Car carToUpdate = findCarById(id);
+
+        updateIfChanged(carToUpdate, carDto);
+
         carToUpdate.setCarNumber(carDto.getCarNumber());
         carToUpdate.setBrand(carDto.getBrand());
         carToUpdate.setModel(carDto.getModel());
@@ -67,16 +64,19 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public List<CarResponse> getAllCars() {
-        return carRepository.findAllByDeletedFalse().stream()
+    public ResponseList<CarResponse> getAllCars(int offset, int limit) {
+        Page<Car> carPage = carRepository.findAllByDeletedFalse(PageRequest.of(offset, limit));
+
+        List<CarResponse> carList = carPage.getContent().stream()
                 .map(carMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
+
+        return new ResponseList<>(carList);
     }
 
     @Override
     public CarResponse getCarById(Long id) {
-        return carMapper.toDto(carRepository.findCarByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new EntityNotFoundException("Car with this id not found!")));
+        return carMapper.toDto(findCarById(id));
     }
 
     @Override
@@ -85,9 +85,20 @@ public class CarServiceImpl implements CarService {
                 .orElseThrow(() -> new EntityNotFoundException("Car with this id not found!")));
     }
 
+    private void updateIfChanged(Car carToUpdate, CarRequest carDto){
+        if (!carToUpdate.getCarNumber().equals(carDto.getCarNumber())) {
+            checkIfCarUnique(carDto);
+        }
+    }
+
     private void checkIfCarUnique(CarRequest carRequest) {
         if (carRepository.findCarByCarNumberAndDeletedFalse(carRequest.getCarNumber()).isPresent()) {
             throw new ResourceAlreadyTakenException("This car number already taken!");
         }
+    }
+
+    private Car findCarById(Long carId) {
+        return carRepository.findCarByIdAndDeletedFalse(carId)
+                .orElseThrow(() -> new EntityNotFoundException("Car with this id not found!"));
     }
 }

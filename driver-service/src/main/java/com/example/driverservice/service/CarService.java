@@ -1,9 +1,8 @@
 package com.example.driverservice.service;
 
-import com.example.driverservice.dto.car.CarRequest;
-import com.example.driverservice.dto.car.CarResponse;
-
-import java.util.List;
+import com.example.driverservice.dto.response.ResponseList;
+import com.example.driverservice.dto.request.CarRequest;
+import com.example.driverservice.dto.response.CarResponse;
 
 public interface CarService {
     void addCar(CarRequest carDto);
@@ -12,7 +11,7 @@ public interface CarService {
 
     void updateCar(Long id, CarRequest carDto);
 
-    List<CarResponse> getAllCars();
+    ResponseList<CarResponse> getAllCars(int offset, int limit);
 
     CarResponse getCarById(Long id);
 

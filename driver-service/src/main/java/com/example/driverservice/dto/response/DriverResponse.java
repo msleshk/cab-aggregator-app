@@ -1,4 +1,4 @@
-package com.example.driverservice.dto.driver;
+package com.example.driverservice.dto.response;
 
 import com.example.driverservice.model.enums.Gender;
 import lombok.AllArgsConstructor;
