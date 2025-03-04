@@ -20,7 +20,7 @@ public class RatingRequest {
     private Long userId;
 
     @NotNull(message = "User role should not be null!")
-    @Pattern(regexp = "^(Passenger|Driver)$", message = "User role must be either 'Passenger' or 'Driver'")
+    @Pattern(regexp = "^(PASSENGER|DRIVER)$", message = "User role must be either 'Passenger' or 'Driver'")
     private String userRole;
 
     @Min(value = 1, message = "Rating must be at least 1")
