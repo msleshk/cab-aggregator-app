@@ -5,6 +5,7 @@ import cab.app.paymentservice.dto.response.PayoutResponse;
 import cab.app.paymentservice.exception.ValidationException;
 import cab.app.paymentservice.service.PayoutService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,18 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/payout")
+@RequiredArgsConstructor
 public class PayoutController {
+
     private final PayoutService payoutService;
 
-    public PayoutController(PayoutService payoutService) {
-        this.payoutService = payoutService;
-    }
-
     @PostMapping
-    public ResponseEntity<PayoutResponse> getPayout(@RequestBody @Valid PayoutRequest payoutRequest, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()){
-            throw new ValidationException(bindingResult.getAllErrors().toString());
-        }
+    public ResponseEntity<PayoutResponse> getPayout(@RequestBody @Valid PayoutRequest payoutRequest) {
         return ResponseEntity.ok().body(payoutService.createPayout(payoutRequest));
     }
 }

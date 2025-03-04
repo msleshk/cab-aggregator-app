@@ -5,6 +5,7 @@ import cab.app.paymentservice.exception.InsufficientBalanceException;
 import cab.app.paymentservice.model.DriverBalance;
 import cab.app.paymentservice.repository.DriverBalanceRepository;
 import cab.app.paymentservice.service.DriverBalanceService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,12 +13,10 @@ import java.math.BigDecimal;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class DriverBalanceServiceImpl implements DriverBalanceService {
-    private final DriverBalanceRepository driverBalanceRepository;
 
-    public DriverBalanceServiceImpl(DriverBalanceRepository driverBalanceRepository) {
-        this.driverBalanceRepository = driverBalanceRepository;
-    }
+    private final DriverBalanceRepository driverBalanceRepository;
 
     @Override
     public void createDriverBalance(Long driverId) {
@@ -44,9 +43,7 @@ public class DriverBalanceServiceImpl implements DriverBalanceService {
         DriverBalance driverBalance = driverBalanceRepository.findById(driverId).orElseThrow(() -> new EntityNotFoundException("Driver balance not found!"));
 
         BigDecimal balance = getDriverBalance(driverId);
-        if (balance.compareTo(amount) < 0) {
-            throw new InsufficientBalanceException("Insufficient money on balance!");
-        }
+        checkIfBalanceSufficient(balance, amount);
 
         driverBalance.setBalance(balance.subtract(amount));
         driverBalanceRepository.save(driverBalance);
@@ -58,6 +55,12 @@ public class DriverBalanceServiceImpl implements DriverBalanceService {
     public BigDecimal getDriverBalance(Long driverId) {
         DriverBalance driverBalance = driverBalanceRepository.findById(driverId).orElseThrow(() -> new EntityNotFoundException("Driver balance not found!"));
         return driverBalance.getBalance();
+    }
+
+    private void checkIfBalanceSufficient(BigDecimal balance, BigDecimal amount){
+        if (balance.compareTo(amount) < 0) {
+            throw new InsufficientBalanceException("Insufficient money on balance!");
+        }
     }
 
 }

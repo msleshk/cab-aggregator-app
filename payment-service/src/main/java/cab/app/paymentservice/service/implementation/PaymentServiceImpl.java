@@ -4,6 +4,7 @@ import cab.app.paymentservice.dto.request.CreatePaymentRequest;
 import cab.app.paymentservice.dto.request.PayRequest;
 import cab.app.paymentservice.dto.response.PayResponse;
 import cab.app.paymentservice.dto.response.PaymentResponse;
+import cab.app.paymentservice.dto.response.ResponseList;
 import cab.app.paymentservice.exception.*;
 import cab.app.paymentservice.model.Payment;
 import cab.app.paymentservice.model.PromoCode;
@@ -13,6 +14,8 @@ import cab.app.paymentservice.repository.PromoCodeRepository;
 import cab.app.paymentservice.service.DriverBalanceService;
 import cab.app.paymentservice.service.PaymentService;
 import cab.app.paymentservice.util.PaymentMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,18 +26,13 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
+
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
     private final PromoCodeRepository promoCodeRepository;
     private final DriverBalanceService driverBalanceService;
-
-    public PaymentServiceImpl(PaymentRepository paymentRepository, PaymentMapper paymentMapper, PromoCodeRepository promoCodeRepository, DriverBalanceService driverBalanceService) {
-        this.paymentRepository = paymentRepository;
-        this.paymentMapper = paymentMapper;
-        this.promoCodeRepository = promoCodeRepository;
-        this.driverBalanceService = driverBalanceService;
-    }
 
     @Override
     @Transactional
@@ -60,14 +58,14 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public void deletePayment(Long paymentId) {
-        Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new EntityNotFoundException("Payment not found!"));
+        Payment payment = findPaymentById(paymentId);
         paymentRepository.delete(payment);
     }
 
     @Override
     @Transactional
     public PayResponse payForRide(PayRequest payRequest) {
-        Payment payment = paymentRepository.findByRideId(payRequest.getRideId()).orElseThrow(() -> new EntityNotFoundException("Payment not found!"));
+        Payment payment = findPaymentByRideId(payRequest.getRideId());
 
         if (!payment.getPassengerId().equals(payRequest.getPassengerId())) {
             throw new IllegalArgumentException("Wrong passenger id!");
@@ -81,20 +79,33 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<PaymentResponse> getAllPayments() {
-        return paymentRepository.findAll()
-                .stream().map(paymentMapper::toDto)
-                .collect(Collectors.toList());
+    public ResponseList<PaymentResponse> getAllPayments(int offset, int limit) {
+        return new ResponseList<>(paymentRepository.findAll(PageRequest.of(offset, limit))
+                .getContent()
+                .stream()
+                .map(paymentMapper::toDto)
+                .collect(Collectors.toList())
+        );
     }
 
     @Override
     public PaymentResponse getPaymentById(Long paymentId) {
-        return paymentMapper.toDto(paymentRepository.findById(paymentId).orElseThrow(() -> new EntityNotFoundException("Payment not found!")));
+        return paymentMapper.toDto(findPaymentById(paymentId));
     }
 
     @Override
     public PaymentResponse getPaymentByRide(Long rideId) {
-        return paymentMapper.toDto(paymentRepository.findByRideId(rideId).orElseThrow(() -> new EntityNotFoundException("Payment not found!")));
+        return paymentMapper.toDto(findPaymentByRideId(rideId));
+    }
+
+    private Payment findPaymentByRideId(Long rideId) {
+        return paymentRepository.findByRideId(rideId).orElseThrow(()
+                -> new EntityNotFoundException("Payment not found!"));
+    }
+
+    private Payment findPaymentById(Long id) {
+        return paymentRepository.findById(id).orElseThrow(()
+                -> new EntityNotFoundException("Payment not found!"));
     }
 
     private BigDecimal applyPromoCode(String paymentPromoCode, BigDecimal finalAmount) {

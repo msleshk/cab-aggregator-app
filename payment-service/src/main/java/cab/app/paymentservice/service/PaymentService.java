@@ -4,6 +4,7 @@ import cab.app.paymentservice.dto.request.CreatePaymentRequest;
 import cab.app.paymentservice.dto.request.PayRequest;
 import cab.app.paymentservice.dto.response.PayResponse;
 import cab.app.paymentservice.dto.response.PaymentResponse;
+import cab.app.paymentservice.dto.response.ResponseList;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface PaymentService {
 
     PayResponse payForRide(PayRequest payRequest);
 
-    List<PaymentResponse> getAllPayments();
+    ResponseList<PaymentResponse> getAllPayments(int offset, int limit);
 
     PaymentResponse getPaymentById(Long paymentId);
 

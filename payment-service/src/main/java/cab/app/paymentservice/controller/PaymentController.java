@@ -2,11 +2,14 @@ package cab.app.paymentservice.controller;
 
 import cab.app.paymentservice.dto.request.CreatePaymentRequest;
 import cab.app.paymentservice.dto.request.PayRequest;
+import cab.app.paymentservice.dto.request.RequestParams;
 import cab.app.paymentservice.dto.response.PayResponse;
 import cab.app.paymentservice.dto.response.PaymentResponse;
+import cab.app.paymentservice.dto.response.ResponseList;
 import cab.app.paymentservice.exception.ValidationException;
 import cab.app.paymentservice.service.PaymentService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -16,27 +19,19 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/payment")
+@RequiredArgsConstructor
 public class PaymentController {
+
     private final PaymentService paymentService;
 
-    public PaymentController(PaymentService paymentService) {
-        this.paymentService = paymentService;
-    }
-
     @PostMapping
-    public ResponseEntity<Void> createPayment(@RequestBody @Valid CreatePaymentRequest paymentRequest, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()){
-            throw new ValidationException(bindingResult.getAllErrors().toString());
-        }
+    public ResponseEntity<Void> createPayment(@RequestBody @Valid CreatePaymentRequest paymentRequest) {
         paymentService.createPayment(paymentRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PatchMapping("/pay")
-    public ResponseEntity<PayResponse> payForRide(@RequestBody @Valid PayRequest payRequest, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()){
-            throw new ValidationException(bindingResult.getAllErrors().toString());
-        }
+    public ResponseEntity<PayResponse> payForRide(@RequestBody @Valid PayRequest payRequest) {
         return ResponseEntity.ok().body(paymentService.payForRide(payRequest));
     }
 
@@ -47,8 +42,8 @@ public class PaymentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PaymentResponse>> getAllPayments() {
-        return ResponseEntity.ok().body(paymentService.getAllPayments());
+    public ResponseEntity<ResponseList<PaymentResponse>> getAllPayments(@RequestBody @Valid RequestParams params) {
+        return ResponseEntity.ok().body(paymentService.getAllPayments(params.offset(), params.limit()));
     }
 
     @GetMapping("/{paymentId}")
