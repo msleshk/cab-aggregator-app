@@ -1,4 +1,4 @@
-package com.example.passengerservice.dto;
+package com.example.passengerservice.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

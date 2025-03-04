@@ -1,32 +1,27 @@
 package com.example.passengerservice.controller;
 
-import com.example.passengerservice.dto.PassengerRequest;
-import com.example.passengerservice.dto.PassengerResponse;
+import com.example.passengerservice.dto.request.PassengerRequest;
+import com.example.passengerservice.dto.request.PassengerRequestParams;
+import com.example.passengerservice.dto.response.PassengerResponse;
+import com.example.passengerservice.dto.response.PassengerResponseList;
 import com.example.passengerservice.service.PassengerService;
 import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/passengers")
+@RequiredArgsConstructor
 public class PassengerController {
     private final PassengerService passengerService;
 
-    public PassengerController(PassengerService passengerService) {
-        this.passengerService = passengerService;
-    }
-
     @PostMapping
-    public ResponseEntity<Void> addPassenger(@RequestBody @Valid PassengerRequest passengerRequest, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()){
-            throw new ValidationException(bindingResult.getAllErrors().toString());
-        }
+    public ResponseEntity<Void> addPassenger(@RequestBody @Valid PassengerRequest passengerRequest) {
         passengerService.addPassenger(passengerRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/{id}")
@@ -36,17 +31,14 @@ public class PassengerController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> updatePassenger(@PathVariable("id") Long id, @RequestBody @Valid PassengerRequest passengerRequest, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()){
-            throw new ValidationException(bindingResult.getAllErrors().toString());
-        }
+    public ResponseEntity<Void> updatePassenger(@PathVariable("id") Long id, @RequestBody @Valid PassengerRequest passengerRequest) {
         passengerService.updatePassenger(id, passengerRequest);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<PassengerResponse>> getPassengers() {
-        return ResponseEntity.ok(passengerService.getAllPassengers());
+    public ResponseEntity<PassengerResponseList> getPassengers(@RequestBody @Valid PassengerRequestParams requestParams) {
+        return ResponseEntity.ok(passengerService.getAllPassengers(requestParams.offset(), requestParams.limit()));
     }
 
     @GetMapping("/{id}")

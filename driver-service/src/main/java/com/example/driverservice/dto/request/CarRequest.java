@@ -28,6 +28,6 @@ public class CarRequest {
 
     @NotNull(message = "Car number cannot be empty")
     @Size(max = 20, message = "Car number must not exceed 20 characters")
-    @Pattern(regexp = "^[A-Z0-9-]+$", message = "Car number must contain only uppercase letters, numbers, and hyphens")
+    @Pattern(regexp = "\\d{4}[A-Z]{2}-\\d", message = "Car number must contain only uppercase letters, numbers, and hyphens")
     private String carNumber;
 }

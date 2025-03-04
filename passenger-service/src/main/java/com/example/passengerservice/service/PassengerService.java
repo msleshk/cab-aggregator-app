@@ -1,9 +1,9 @@
 package com.example.passengerservice.service;
 
-import com.example.passengerservice.dto.PassengerRequest;
-import com.example.passengerservice.dto.PassengerResponse;
+import com.example.passengerservice.dto.request.PassengerRequest;
+import com.example.passengerservice.dto.response.PassengerResponse;
+import com.example.passengerservice.dto.response.PassengerResponseList;
 
-import java.util.List;
 
 public interface PassengerService {
     void addPassenger(PassengerRequest dto);
@@ -14,5 +14,5 @@ public interface PassengerService {
 
     PassengerResponse getPassengerById(Long id);
 
-    List<PassengerResponse> getAllPassengers();
+    PassengerResponseList getAllPassengers(int offset, int limit);
 }
