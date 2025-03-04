@@ -1,6 +1,7 @@
 package cab.app.rideservice.service.implementation;
 
 import cab.app.rideservice.dto.request.RideRequest;
+import cab.app.rideservice.dto.response.ResponseList;
 import cab.app.rideservice.dto.response.RideResponse;
 import cab.app.rideservice.exception.InvalidStatusException;
 import cab.app.rideservice.exception.RideNotFoundException;
@@ -9,6 +10,9 @@ import cab.app.rideservice.model.enums.RideStatus;
 import cab.app.rideservice.repository.RideRepository;
 import cab.app.rideservice.service.RideService;
 import cab.app.rideservice.util.RideMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,18 +22,13 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class RideServiceImpl implements RideService {
+
     private final RideStatusValidator statusValidator;
     private final RideRepository rideRepository;
     private final RideMapper rideMapper;
     private final CostCalculator costCalculator;
-
-    public RideServiceImpl(RideStatusValidator statusValidator, RideRepository rideRepository, RideMapper rideMapper, CostCalculator costCalculator) {
-        this.statusValidator = statusValidator;
-        this.rideRepository = rideRepository;
-        this.rideMapper = rideMapper;
-        this.costCalculator = costCalculator;
-    }
 
     @Override
     @Transactional
@@ -49,7 +48,7 @@ public class RideServiceImpl implements RideService {
     @Override
     @Transactional
     public void deleteRide(Long rideId) {
-        Ride rideToDelete = rideRepository.findByIdAndDeletedFalse(rideId).orElseThrow(()->new RideNotFoundException("Ride with this id not found!"));
+        Ride rideToDelete = findRideById(rideId);
         rideToDelete.setDeleted(true);
         rideRepository.save(rideToDelete);
     }
@@ -57,9 +56,9 @@ public class RideServiceImpl implements RideService {
     @Override
     @Transactional
     public void updateRide(Long rideId, RideRequest rideRequest) {
-        Ride rideToUpdate = rideRepository.findByIdAndDeletedFalse(rideId).orElseThrow(() -> new RideNotFoundException("Ride with this id not found!"));
+        Ride rideToUpdate = findRideById(rideId);
         // todo check driver and passenger existence
-        if (rideToUpdate.getStatus() == RideStatus.COMPLETED || rideToUpdate.getStatus() == RideStatus.CANCELLED){
+        if (rideToUpdate.getStatus() == RideStatus.COMPLETED || rideToUpdate.getStatus() == RideStatus.CANCELLED) {
             throw new InvalidStatusException("You can't update ride with completed or cancelled status");
         }
         if (rideRequest.getDriverId() != null)
@@ -75,45 +74,66 @@ public class RideServiceImpl implements RideService {
     @Override
     @Transactional
     public void updateRideStatus(Long rideId, String status) {
-        Ride rideToUpdate = rideRepository.findByIdAndDeletedFalse(rideId).orElseThrow(()->new RideNotFoundException("Ride with this id not found!"));
-        statusValidator.validateRideStatus(rideToUpdate.getStatus(), RideStatus.valueOf(status.toUpperCase()));
-        rideToUpdate.setStatus(RideStatus.valueOf(status.toUpperCase()));
+        Ride rideToUpdate = findRideById(rideId);
+        RideStatus newStatus = statusValidator.validateRideStatus(rideToUpdate.getStatus(), RideStatus.valueOf(status.toUpperCase()));
+        rideToUpdate.setStatus(RideStatus.valueOf(newStatus.toString()));
     }
 
     @Override
     public RideResponse getRide(Long rideId) {
-        return rideRepository.findByIdAndDeletedFalse(rideId).map(rideMapper::toDto).orElseThrow(()-> new RideNotFoundException("Ride with this id not found!"));
+        return rideMapper.toDto(findRideById(rideId));
     }
 
     @Override
-    public List<RideResponse> getAllRides() {
-        return rideRepository.findAllByDeletedFalse()
-                .stream().map(rideMapper::toDto)
-                .collect(Collectors.toList());
+    public ResponseList<RideResponse> getAllRides(int offset, int limit) {
+        return new ResponseList<>(
+                rideRepository
+                        .findAllByDeletedFalse(PageRequest.of(offset, limit))
+                        .getContent()
+                        .stream()
+                        .map(rideMapper::toDto)
+                        .collect(Collectors.toList())
+        );
     }
 
     @Override
-    public List<RideResponse> getRidesByStatus(String status) {
-        return rideRepository.findAllByDeletedFalseAndStatus(RideStatus.valueOf(status.toUpperCase()))
-                .stream().map(rideMapper::toDto)
-                .collect(Collectors.toList());
+    public ResponseList<RideResponse> getRidesByStatus(String status, int offset, int limit) {
+        return new ResponseList<>(
+                rideRepository
+                        .findAllByDeletedFalseAndStatus(RideStatus.valueOf(status.toUpperCase()), PageRequest.of(offset, limit))
+                        .getContent()
+                        .stream()
+                        .map(rideMapper::toDto)
+                        .collect(Collectors.toList()));
     }
 
     @Override
-    public List<RideResponse> getAllRidesByPassenger(Long passengerId) {
-        return rideRepository.findAllByDeletedFalseAndPassengerId(passengerId)
-                .stream().map(rideMapper::toDto)
-                .collect(Collectors.toList());
+    public ResponseList<RideResponse> getAllRidesByPassenger(Long passengerId, int offset, int limit) {
+        return new ResponseList<>(
+                rideRepository
+                        .findAllByDeletedFalseAndPassengerId(passengerId, PageRequest.of(offset, limit))
+                        .getContent()
+                        .stream()
+                        .map(rideMapper::toDto)
+                        .collect(Collectors.toList()));
     }
 
     @Override
-    public List<RideResponse> getAllRidesByDriver(Long driverId) {
-        return rideRepository.findAllByDeletedFalseAndDriverId(driverId)
-                .stream().map(rideMapper::toDto)
-                .collect(Collectors.toList());
+    public ResponseList<RideResponse> getAllRidesByDriver(Long driverId, int offset, int limit) {
+        return new ResponseList<>(
+                rideRepository
+                        .findAllByDeletedFalseAndDriverId(driverId, PageRequest.of(offset, limit))
+                        .getContent()
+                        .stream()
+                        .map(rideMapper::toDto)
+                        .collect(Collectors.toList()));
     }
 
-    private Ride updateRideFromDto(Ride rideToUpdate, RideRequest rideRequest){
+    private Ride findRideById(Long rideId) {
+        return rideRepository.findByIdAndDeletedFalse(rideId).orElseThrow(() -> new RideNotFoundException("Ride with this id not found!"));
+    }
+
+    private Ride updateRideFromDto(Ride rideToUpdate, RideRequest rideRequest) {
         rideToUpdate.setDriverId(rideRequest.getPassengerId());
         rideToUpdate.setPassengerId(rideRequest.getPassengerId());
         rideToUpdate.setDepartureAddress(rideRequest.getDepartureAddress());

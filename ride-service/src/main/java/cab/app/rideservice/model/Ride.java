@@ -31,6 +31,7 @@ public class Ride {
     @Column(name = "distance")
     private BigDecimal distance;
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private RideStatus status;
     @Column(name = "order_date_time")
     private LocalDateTime orderDateTime;
