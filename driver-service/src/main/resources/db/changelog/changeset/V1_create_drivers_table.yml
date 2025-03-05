@@ -1,0 +1,51 @@
+databaseChangeLog:
+  - changeSet:
+      id: v1_create_drivers_table
+      author: Maksim Leshko
+      changes:
+        - createSequence:
+            sequenceName: drivers_seq
+            startValue: 1
+            incrementBy: 1
+        - createTable:
+            tableName: drivers
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                  defaultValueComputed: nextval('drivers_seq')
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: phone_number
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: gender
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: car_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_drivers_cars
+                    references: cars(id)
+              - column:
+                  name: is_deleted
+                  type: BOOLEAN
+                  defaultValue: 'false'
+                  constraints:
+                    nullable: false
