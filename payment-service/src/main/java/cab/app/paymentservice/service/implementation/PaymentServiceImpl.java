@@ -115,7 +115,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (!promoCode.isActive()) {
             throw new PromoCodeNotActiveException("Promo code is not active");
         }
-        BigDecimal discount = finalAmount.multiply(promoCode.getDiscountAmount().divide(BigDecimal.valueOf(100)));
+        BigDecimal discount = finalAmount.multiply(BigDecimal.valueOf(promoCode.getDiscountAmount()/100));
         finalAmount = finalAmount.subtract(discount);
         if (finalAmount.compareTo(BigDecimal.ZERO) < 0) {
             finalAmount = BigDecimal.ZERO;

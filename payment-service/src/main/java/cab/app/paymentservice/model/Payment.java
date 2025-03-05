@@ -18,7 +18,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Payment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "payment_seq_generator")
+    @SequenceGenerator(name = "payments_seq_generator", sequenceName = "payments_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
 

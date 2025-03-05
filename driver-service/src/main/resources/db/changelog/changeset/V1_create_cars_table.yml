@@ -3,16 +3,20 @@ databaseChangeLog:
       id: V1_create_cars_table
       author: Maksim Leshko
       changes:
+        - createSequence:
+            sequenceName: cars_seq
+            startValue: 1
+            incrementBy: 1
         - createTable:
             tableName: cars
             columns:
               - column:
                   name: id
                   type: BIGINT
-                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
+                  defaultValueComputed: nextval('cars_seq')
               - column:
                   name: brand
                   type: VARCHAR(255)

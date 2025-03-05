@@ -18,7 +18,8 @@ import java.time.LocalDateTime;
 @Setter
 public class Ride {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ride_seq")
+    @SequenceGenerator(name = "ride_seq", sequenceName = "rides_seq", allocationSize = 1)
     private Long id;
     @Column(name = "driver_id")
     private Long driverId;

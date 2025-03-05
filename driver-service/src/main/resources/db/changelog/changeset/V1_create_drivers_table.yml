@@ -3,16 +3,20 @@ databaseChangeLog:
       id: v1_create_drivers_table
       author: Maksim Leshko
       changes:
+        - createSequence:
+            sequenceName: drivers_seq
+            startValue: 1
+            incrementBy: 1
         - createTable:
             tableName: drivers
             columns:
               - column:
                   name: id
                   type: BIGINT
-                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
+                  defaultValueComputed: nextval('drivers_seq')
               - column:
                   name: name
                   type: VARCHAR(255)

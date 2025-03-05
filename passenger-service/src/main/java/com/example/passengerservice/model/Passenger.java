@@ -11,7 +11,8 @@ import lombok.*;
 @Table(name = "Passengers")
 public class Passenger {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "passenger_generator")
+    @SequenceGenerator(name = "passenger_generator", sequenceName = "pass_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
 

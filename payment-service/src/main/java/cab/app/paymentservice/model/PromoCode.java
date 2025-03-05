@@ -17,14 +17,15 @@ import java.math.BigDecimal;
 public class PromoCode {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "promo_code_seq_generator")
+    @SequenceGenerator(name = "promo_code_seq_generator", sequenceName = "promo_codes_seq", allocationSize = 1)
     private Long id;
 
     @Column(name = "code")
     private String code;
 
     @Column(name = "discount_amount")
-    private BigDecimal discountAmount;
+    private Double discountAmount;
 
     @Column(name = "is_active")
     private boolean isActive;

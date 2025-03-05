@@ -17,7 +17,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Payout {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "payout_seq_generator")
+    @SequenceGenerator(name = "payout_seq_generator", sequenceName = "payouts_seq", allocationSize = 1)
     private Long id;
 
     @Column(name = "driver_id")

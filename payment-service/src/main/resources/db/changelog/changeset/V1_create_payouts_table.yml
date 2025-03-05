@@ -3,16 +3,20 @@ databaseChangeLog:
       id: 3
       author: Maksim Leshko
       changes:
+        - createSequence:
+            sequenceName: payouts_seq
+            startValue: 1
+            incrementBy: 1
         - createTable:
             tableName: payouts
             columns:
               - column:
                   name: id
                   type: BIGINT
-                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
+                  defaultValueComputed: nextval('payouts_seq')
               - column:
                   name: driver_id
                   type: BIGINT

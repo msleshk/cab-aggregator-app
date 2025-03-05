@@ -14,7 +14,8 @@ import lombok.Setter;
 @Table(name = "cars")
 public class Car {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "car_seq_generator")
+    @SequenceGenerator(name = "car_seq_generator", sequenceName = "cars_seq", allocationSize = 1)
     private Long id;
     @Column(name = "brand")
     private String brand;
