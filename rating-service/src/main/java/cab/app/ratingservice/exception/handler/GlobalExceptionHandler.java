@@ -5,6 +5,7 @@ import cab.app.ratingservice.dto.response.exception.MultiException;
 import cab.app.ratingservice.exception.EntityNotFoundException;
 import cab.app.ratingservice.exception.RatingAlreadyExistException;
 import cab.app.ratingservice.exception.RatingNotFoundException;
+import cab.app.ratingservice.exception.RideNotCompletedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -26,6 +27,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RatingNotFoundException.class)
     public ResponseEntity<ExceptionDto> handleRatingNotFoundException(RatingNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ExceptionDto.builder()
+                        .message(ex.getMessage())
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(RideNotCompletedException.class)
+    public ResponseEntity<ExceptionDto> handleRideNotCompletedException(RideNotCompletedException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 ExceptionDto.builder()
                         .message(ex.getMessage())

@@ -8,6 +8,7 @@ import cab.app.ratingservice.dto.response.ResponseList;
 import cab.app.ratingservice.dto.response.ride.RideResponse;
 import cab.app.ratingservice.exception.RatingAlreadyExistException;
 import cab.app.ratingservice.exception.RatingNotFoundException;
+import cab.app.ratingservice.exception.RideNotCompletedException;
 import cab.app.ratingservice.model.Rating;
 import cab.app.ratingservice.model.enums.Role;
 import cab.app.ratingservice.repository.RatingRepository;
@@ -49,6 +50,10 @@ public class RatingServiceImpl implements RatingService {
         validator.checkIfUserExist(ratingRequest.getUserId(), userRole);
 
         RideResponse rideToRate = validator.getRideById(ratingRequest.getRideId());
+
+        if (!rideToRate.getStatus().equals("COMPLETED")){
+            throw new RideNotCompletedException("Ride is not completed to rate!");
+        }
 
         if (ratingRepository.findRatingByRideIdAndUserRole(ratingRequest.getRideId(), userRole).isPresent()) {
             throw new RatingAlreadyExistException("Rating already was created!");
