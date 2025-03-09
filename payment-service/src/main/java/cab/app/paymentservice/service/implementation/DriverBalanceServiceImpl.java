@@ -17,9 +17,11 @@ import java.math.BigDecimal;
 public class DriverBalanceServiceImpl implements DriverBalanceService {
 
     private final DriverBalanceRepository driverBalanceRepository;
+    private final EntityValidator validator;
 
     @Override
     public void createDriverBalance(Long driverId) {
+        validator.checkIfDriverExist(driverId);
         if (driverBalanceRepository.findById(driverId).isEmpty()){
             DriverBalance driverBalance = new DriverBalance(driverId, BigDecimal.ZERO);
             driverBalanceRepository.save(driverBalance);
