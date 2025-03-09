@@ -5,6 +5,7 @@ import cab.app.ratingservice.dto.request.RatingToUpdate;
 import cab.app.ratingservice.dto.response.AverageRating;
 import cab.app.ratingservice.dto.response.RatingResponse;
 import cab.app.ratingservice.dto.response.ResponseList;
+import cab.app.ratingservice.dto.response.ride.RideResponse;
 import cab.app.ratingservice.exception.RatingAlreadyExistException;
 import cab.app.ratingservice.exception.RatingNotFoundException;
 import cab.app.ratingservice.model.Rating;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +29,7 @@ public class RatingServiceImpl implements RatingService {
 
     private final RatingRepository ratingRepository;
     private final RatingMapper ratingMapper;
+    private final EntityValidator validator;
 
 
     @Override
@@ -41,12 +44,23 @@ public class RatingServiceImpl implements RatingService {
     @Override
     @Transactional
     public void addRating(RatingRequest ratingRequest) {
-        // todo check if ride and user exist and get rated user id
         Role userRole = validateRole(ratingRequest.getUserRole());
+
+        validator.checkIfUserExist(ratingRequest.getUserId(), userRole);
+
+        RideResponse rideToRate = validator.getRideById(ratingRequest.getRideId());
+
         if (ratingRepository.findRatingByRideIdAndUserRole(ratingRequest.getRideId(), userRole).isPresent()) {
             throw new RatingAlreadyExistException("Rating already was created!");
         }
+
         Rating rating = ratingMapper.toEntity(ratingRequest);
+
+        validateRating(rideToRate, rating);
+        switch (userRole) {
+            case DRIVER -> rating.setRatedUserId(rideToRate.getPassengerId());
+            case PASSENGER -> rating.setRatedUserId(rideToRate.getDriverId());
+        }
         rating.setCreatedAt(LocalDateTime.now());
         ratingRepository.save(rating);
     }
@@ -96,13 +110,28 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public AverageRating getAverageRating(Long userId, String role) {
-        // todo check if user exist
         Role userRole = validateRole(role);
+        validator.checkIfUserExist(userId, userRole);
         return new AverageRating(userId, calculateRating(userId, userRole));
     }
 
-    private Rating findRatingById(String id){
+    private Rating findRatingById(String id) {
         return ratingRepository.findById(id).orElseThrow(() -> new RatingNotFoundException("Rating with this id not found!"));
+    }
+
+    private void validateRating(RideResponse ride, Rating rating) {
+        switch (rating.getUserRole()) {
+            case DRIVER -> {
+                if (!Objects.equals(ride.getDriverId(), rating.getUserId())) {
+                    throw new IllegalArgumentException("Wrong user id for this ride!");
+                }
+            }
+            case PASSENGER -> {
+                if (!Objects.equals(ride.getPassengerId(), rating.getUserId())) {
+                    throw new IllegalArgumentException("Wrong user id for this ride!");
+                }
+            }
+        }
     }
 
     private Role validateRole(String role) {

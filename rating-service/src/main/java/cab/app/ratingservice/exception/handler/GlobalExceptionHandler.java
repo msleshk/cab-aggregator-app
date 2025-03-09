@@ -1,7 +1,8 @@
 package cab.app.ratingservice.exception.handler;
 
-import cab.app.ratingservice.dto.response.ExceptionDto;
-import cab.app.ratingservice.dto.response.MultiException;
+import cab.app.ratingservice.dto.response.exception.ExceptionDto;
+import cab.app.ratingservice.dto.response.exception.MultiException;
+import cab.app.ratingservice.exception.EntityNotFoundException;
 import cab.app.ratingservice.exception.RatingAlreadyExistException;
 import cab.app.ratingservice.exception.RatingNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RatingNotFoundException.class)
     public ResponseEntity<ExceptionDto> handleRatingNotFoundException(RatingNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ExceptionDto.builder()
+                        .message(ex.getMessage())
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ExceptionDto> handleEntityNotFoundException(EntityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 ExceptionDto.builder()
                         .message(ex.getMessage())
                         .build()
