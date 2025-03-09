@@ -6,16 +6,12 @@ import cab.app.paymentservice.dto.request.RequestParams;
 import cab.app.paymentservice.dto.response.PayResponse;
 import cab.app.paymentservice.dto.response.PaymentResponse;
 import cab.app.paymentservice.dto.response.ResponseList;
-import cab.app.paymentservice.exception.ValidationException;
 import cab.app.paymentservice.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/payment")

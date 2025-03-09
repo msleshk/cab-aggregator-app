@@ -1,4 +1,4 @@
-package cab.app.ratingservice.dto.response;
+package cab.app.ratingservice.dto.response.exception;
 
 import lombok.Builder;
 
