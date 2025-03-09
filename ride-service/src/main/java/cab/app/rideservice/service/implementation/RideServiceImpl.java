@@ -29,14 +29,17 @@ public class RideServiceImpl implements RideService {
     private final RideRepository rideRepository;
     private final RideMapper rideMapper;
     private final CostCalculator costCalculator;
+    private final EntityValidator validator;
 
     @Override
     @Transactional
     public void createRide(RideRequest rideRequest) {
-        // todo check if driver and passenger exist
+        validator.checkIfPassengerExist(rideRequest.getPassengerId());
         Ride ride = rideMapper.toEntity(rideRequest);
-        if (ride.getDriverId() != null)
+        if (ride.getDriverId() != null) {
+            validator.checkIfDriverExist(rideRequest.getDriverId());
             ride.setStatus(RideStatus.ACCEPTED);
+        }
         else
             ride.setStatus(RideStatus.REQUESTED);
 
@@ -57,7 +60,6 @@ public class RideServiceImpl implements RideService {
     @Transactional
     public void updateRide(Long rideId, RideRequest rideRequest) {
         Ride rideToUpdate = findRideById(rideId);
-        // todo check driver and passenger existence
         if (rideToUpdate.getStatus() == RideStatus.COMPLETED || rideToUpdate.getStatus() == RideStatus.CANCELLED) {
             throw new InvalidStatusException("You can't update ride with completed or cancelled status");
         }
@@ -134,6 +136,7 @@ public class RideServiceImpl implements RideService {
     }
 
     private Ride updateRideFromDto(Ride rideToUpdate, RideRequest rideRequest) {
+        // todo check driver and passenger existence, if new and old id are different
         rideToUpdate.setDriverId(rideRequest.getPassengerId());
         rideToUpdate.setPassengerId(rideRequest.getPassengerId());
         rideToUpdate.setDepartureAddress(rideRequest.getDepartureAddress());
