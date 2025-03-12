@@ -24,5 +24,6 @@ public class Rating {
     private Integer rating;
     private String comment;
     private Role userRole;
+    private Role ratedUserRole;
     private LocalDateTime createdAt;
 }

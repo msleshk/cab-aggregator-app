@@ -9,6 +9,7 @@ import cab.app.ratingservice.dto.response.ride.RideResponse;
 import cab.app.ratingservice.exception.RatingAlreadyExistException;
 import cab.app.ratingservice.exception.RatingNotFoundException;
 import cab.app.ratingservice.exception.RideNotCompletedException;
+import cab.app.ratingservice.kafka.KafkaProducer;
 import cab.app.ratingservice.model.Rating;
 import cab.app.ratingservice.model.enums.Role;
 import cab.app.ratingservice.repository.RatingRepository;
@@ -31,6 +32,7 @@ public class RatingServiceImpl implements RatingService {
     private final RatingRepository ratingRepository;
     private final RatingMapper ratingMapper;
     private final EntityValidator validator;
+    private final KafkaProducer kafkaProducer;
 
 
     @Override
@@ -51,7 +53,7 @@ public class RatingServiceImpl implements RatingService {
 
         RideResponse rideToRate = validator.getRideById(ratingRequest.getRideId());
 
-        if (!rideToRate.getStatus().equals("COMPLETED")){
+        if (!rideToRate.getStatus().equals("COMPLETED")) {
             throw new RideNotCompletedException("Ride is not completed to rate!");
         }
 
@@ -63,11 +65,31 @@ public class RatingServiceImpl implements RatingService {
 
         validateRating(rideToRate, rating);
         switch (userRole) {
-            case DRIVER -> rating.setRatedUserId(rideToRate.getPassengerId());
-            case PASSENGER -> rating.setRatedUserId(rideToRate.getDriverId());
+            case DRIVER -> {
+                rating.setRatedUserRole(Role.PASSENGER);
+                rating.setRatedUserId(rideToRate.getPassengerId());
+            }
+            case PASSENGER -> {
+                rating.setRatedUserRole(Role.DRIVER);
+                rating.setRatedUserId(rideToRate.getDriverId());
+            }
         }
+
         rating.setCreatedAt(LocalDateTime.now());
         ratingRepository.save(rating);
+        sendUpdatedRating(rating);
+    }
+
+    private void sendUpdatedRating(Rating rating) {
+        Role ratedUserRole = rating.getRatedUserRole();
+        Long ratedUserId = rating.getRatedUserId();
+        AverageRating averageRatingResponse = getAverageRating(ratedUserId, String.valueOf(ratedUserRole));
+//        Double newAverageRating = calculateRating(ratedUserId, ratedUserRole);
+//        AverageRating averageRatingResponse = new AverageRating(ratedUserId, newAverageRating);
+        switch (ratedUserRole) {
+            case DRIVER -> kafkaProducer.sendDriverAvgTaring(averageRatingResponse);
+            case PASSENGER -> kafkaProducer.sendPassengerAvgRating(averageRatingResponse);
+        }
     }
 
     @Override
@@ -75,6 +97,7 @@ public class RatingServiceImpl implements RatingService {
     public void deleteRating(String id) {
         Rating rating = findRatingById(id);
         ratingRepository.delete(rating);
+        sendUpdatedRating(rating);
     }
 
     @Override
@@ -83,8 +106,8 @@ public class RatingServiceImpl implements RatingService {
         Rating ratingToUpdate = findRatingById(id);
         ratingToUpdate.setRating(dto.getRating());
         ratingToUpdate.setComment(dto.getComment());
-
         ratingRepository.save(ratingToUpdate);
+        sendUpdatedRating(ratingToUpdate);
     }
 
     @Override

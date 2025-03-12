@@ -11,5 +11,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AverageRating {
     private Long id;
-    private Double averageRating;
+    private Double avgRating;
 }
