@@ -26,6 +26,8 @@ public class Driver {
     private String phoneNumber;
     @Column(name = "gender")
     private Gender gender;
+    @Column(name = "average_rating")
+    private Double averageRating;
     @OneToOne
     @JoinColumn(name = "car_id", referencedColumnName = "id")
     private Car car;

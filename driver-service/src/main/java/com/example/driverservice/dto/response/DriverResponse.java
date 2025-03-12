@@ -14,6 +14,7 @@ public class DriverResponse {
     private Long id;
     private String name;
     private String email;
+    private Double averageRating;
     private String phoneNumber;
     private Gender gender;
     private Long carId;

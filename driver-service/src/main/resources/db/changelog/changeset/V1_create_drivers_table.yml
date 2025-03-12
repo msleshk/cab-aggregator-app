@@ -38,6 +38,9 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: average_rating
+                  type: real
+              - column:
                   name: car_id
                   type: BIGINT
                   constraints:
