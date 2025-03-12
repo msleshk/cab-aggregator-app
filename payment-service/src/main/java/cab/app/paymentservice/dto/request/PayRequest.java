@@ -9,7 +9,9 @@ public record PayRequest(
         Long rideId,
 
         @NotNull(message = "Passenger ID cannot be null")
-        Long passengerId
+        Long passengerId,
+
+        String promoCode
 ) {
 
 }

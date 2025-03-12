@@ -5,7 +5,6 @@ import cab.app.paymentservice.dto.request.PayRequest;
 import cab.app.paymentservice.dto.response.PayResponse;
 import cab.app.paymentservice.dto.response.PaymentResponse;
 import cab.app.paymentservice.dto.response.ResponseList;
-import cab.app.paymentservice.dto.response.RideResponse;
 import cab.app.paymentservice.exception.*;
 import cab.app.paymentservice.model.Payment;
 import cab.app.paymentservice.model.PromoCode;
@@ -22,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,37 +32,22 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentMapper paymentMapper;
     private final PromoCodeRepository promoCodeRepository;
     private final DriverBalanceService driverBalanceService;
-    private final EntityValidator validator;
 
     @Override
     @Transactional
     public void createPayment(CreatePaymentRequest paymentRequest) {
-        RideResponse ride = validator.getRideById(paymentRequest.rideId());
-        validatePayment(ride, paymentRequest);
-
-        BigDecimal finalAmount = ride.cost();
-        if (paymentRequest.promoCode() != null) {
-            finalAmount = applyPromoCode(paymentRequest.promoCode(), finalAmount);
-        }
+        validatePayment(paymentRequest);
         Payment payment = paymentMapper.toEntity(paymentRequest);
 
         payment.setCreatedAt(LocalDateTime.now());
         payment.setStatus(PaymentStatus.PENDING);
-        payment.setCost(ride.cost());
-        payment.setFinalCost(finalAmount);
 
         driverBalanceService.createDriverBalance(payment.getDriverId());
 
         paymentRepository.save(payment);
     }
 
-    private void validatePayment(RideResponse ride, CreatePaymentRequest paymentRequest){
-        if (!Objects.equals(ride.driverId(), paymentRequest.driverId())){
-            throw new IllegalArgumentException("Driver id is not correct for this ride!");
-        }
-        if (!Objects.equals(ride.passengerId(), paymentRequest.passengerId())){
-            throw new IllegalArgumentException("Passenger id is not correct for this ride!");
-        }
+    private void validatePayment(CreatePaymentRequest paymentRequest){
         if (paymentRepository.findByRideId(paymentRequest.driverId()).isPresent()) {
             throw new PaymentAlreadyExistException("Payment for this ride already exist!");
         }
@@ -83,10 +65,15 @@ public class PaymentServiceImpl implements PaymentService {
     public PayResponse payForRide(PayRequest payRequest) {
         Payment payment = findPaymentByRideId(payRequest.rideId());
 
+        BigDecimal finalAmount = payment.getCost();
+        if (payRequest.promoCode() != null) {
+            finalAmount = applyPromoCode(payRequest.promoCode(), finalAmount);
+        }
         if (!payment.getPassengerId().equals(payRequest.passengerId())) {
             throw new IllegalArgumentException("Wrong passenger id!");
         }
         payment.setStatus(PaymentStatus.PAID);
+        payment.setFinalCost(finalAmount);
         paymentRepository.save(payment);
 
         driverBalanceService.increaseDriverBalance(payment.getDriverId(), payment.getCost());

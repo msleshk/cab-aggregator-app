@@ -1,7 +1,5 @@
 package cab.app.paymentservice.dto.request;
 
-
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -18,7 +16,8 @@ public record CreatePaymentRequest(
         @NotNull(message = "Driver ID cannot be null")
         Long driverId,
 
-        String promoCode
+        @NotNull(message = "Cost should not be null")
+        BigDecimal cost
 ) {
 
 }
