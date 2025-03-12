@@ -25,6 +25,9 @@ public class Passenger {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Column(name = "average_rating")
+    private Double averageRating;
+
     @Column(name = "is_deleted")
     private boolean deleted;
 }
