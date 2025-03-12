@@ -1,10 +1,12 @@
 package cab.app.rideservice.service.implementation;
 
+import cab.app.rideservice.dto.kafka.CreatePayment;
 import cab.app.rideservice.dto.request.RideRequest;
 import cab.app.rideservice.dto.response.ResponseList;
 import cab.app.rideservice.dto.response.RideResponse;
 import cab.app.rideservice.exception.InvalidStatusException;
 import cab.app.rideservice.exception.RideNotFoundException;
+import cab.app.rideservice.kafka.KafkaProducer;
 import cab.app.rideservice.model.Ride;
 import cab.app.rideservice.model.enums.RideStatus;
 import cab.app.rideservice.repository.RideRepository;
@@ -30,6 +32,7 @@ public class RideServiceImpl implements RideService {
     private final RideMapper rideMapper;
     private final CostCalculator costCalculator;
     private final EntityValidator validator;
+    private final KafkaProducer kafkaProducerService;
 
     @Override
     @Transactional
@@ -73,12 +76,26 @@ public class RideServiceImpl implements RideService {
         rideRepository.save(updatedRide);
     }
 
+    private void sendPaymentUpdate(Long rideId){
+        Ride ride = findRideById(rideId);
+        CreatePayment payment = CreatePayment.builder()
+                .rideId(rideId)
+                .passengerId(ride.getPassengerId())
+                .driverId(ride.getDriverId())
+                .cost(ride.getCost())
+                .build();
+        kafkaProducerService.sendNewPayment(payment);
+    }
+
     @Override
     @Transactional
     public void updateRideStatus(Long rideId, String status) {
         Ride rideToUpdate = findRideById(rideId);
         RideStatus newStatus = statusValidator.validateRideStatus(rideToUpdate.getStatus(), RideStatus.valueOf(status.toUpperCase()));
         rideToUpdate.setStatus(RideStatus.valueOf(newStatus.toString()));
+        if (newStatus.equals(RideStatus.COMPLETED)){
+            sendPaymentUpdate(rideId);
+        }
     }
 
     @Override
