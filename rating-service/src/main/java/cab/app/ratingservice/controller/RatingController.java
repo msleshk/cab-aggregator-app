@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/rating")
+@RequestMapping("api/v1/rating")
 @RequiredArgsConstructor
 public class RatingController {
 

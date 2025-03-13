@@ -25,26 +25,14 @@ public class EntityValidator {
     }
 
     private void checkIfDriverExist(Long driverId) {
-        try {
-            driverClient.getDriverById(driverId);
-        } catch (FeignException.NotFound ex) {
-            throw new EntityNotFoundException(ex.getMessage());
-        }
+        driverClient.getDriverById(driverId);
     }
 
     private void checkIfPassengerExist(Long passengerId) {
-        try {
-            passengerClient.getPassengerById(passengerId);
-        } catch (FeignException.NotFound ex) {
-            throw new EntityNotFoundException(ex.getMessage());
-        }
+        passengerClient.getPassengerById(passengerId);
     }
 
     public RideResponse getRideById(Long rideId) {
-        try {
-            return rideClient.getRideById(rideId);
-        } catch (FeignException.NotFound ex) {
-            throw new EntityNotFoundException(ex.getMessage());
-        }
+        return rideClient.getRideById(rideId);
     }
 }

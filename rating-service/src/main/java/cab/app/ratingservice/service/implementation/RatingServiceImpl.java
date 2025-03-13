@@ -47,17 +47,17 @@ public class RatingServiceImpl implements RatingService {
     @Override
     @Transactional
     public void addRating(RatingRequest ratingRequest) {
-        Role userRole = validateRole(ratingRequest.getUserRole());
+        Role userRole = validateRole(ratingRequest.userRole());
 
-        validator.checkIfUserExist(ratingRequest.getUserId(), userRole);
+        validator.checkIfUserExist(ratingRequest.userId(), userRole);
 
-        RideResponse rideToRate = validator.getRideById(ratingRequest.getRideId());
+        RideResponse rideToRate = validator.getRideById(ratingRequest.rideId());
 
-        if (!rideToRate.getStatus().equals("COMPLETED")) {
+        if (!rideToRate.status().equals("COMPLETED")) {
             throw new RideNotCompletedException("Ride is not completed to rate!");
         }
 
-        if (ratingRepository.findRatingByRideIdAndUserRole(ratingRequest.getRideId(), userRole).isPresent()) {
+        if (ratingRepository.findRatingByRideIdAndUserRole(ratingRequest.rideId(), userRole).isPresent()) {
             throw new RatingAlreadyExistException("Rating already was created!");
         }
 
@@ -67,11 +67,11 @@ public class RatingServiceImpl implements RatingService {
         switch (userRole) {
             case DRIVER -> {
                 rating.setRatedUserRole(Role.PASSENGER);
-                rating.setRatedUserId(rideToRate.getPassengerId());
+                rating.setRatedUserId(rideToRate.passengerId());
             }
             case PASSENGER -> {
                 rating.setRatedUserRole(Role.DRIVER);
-                rating.setRatedUserId(rideToRate.getDriverId());
+                rating.setRatedUserId(rideToRate.driverId());
             }
         }
 
@@ -84,8 +84,6 @@ public class RatingServiceImpl implements RatingService {
         Role ratedUserRole = rating.getRatedUserRole();
         Long ratedUserId = rating.getRatedUserId();
         AverageRating averageRatingResponse = getAverageRating(ratedUserId, String.valueOf(ratedUserRole));
-//        Double newAverageRating = calculateRating(ratedUserId, ratedUserRole);
-//        AverageRating averageRatingResponse = new AverageRating(ratedUserId, newAverageRating);
         switch (ratedUserRole) {
             case DRIVER -> kafkaProducer.sendDriverAvgTaring(averageRatingResponse);
             case PASSENGER -> kafkaProducer.sendPassengerAvgRating(averageRatingResponse);
@@ -104,8 +102,8 @@ public class RatingServiceImpl implements RatingService {
     @Transactional
     public void updateRating(String id, RatingToUpdate dto) {
         Rating ratingToUpdate = findRatingById(id);
-        ratingToUpdate.setRating(dto.getRating());
-        ratingToUpdate.setComment(dto.getComment());
+        ratingToUpdate.setRating(dto.rating());
+        ratingToUpdate.setComment(dto.comment());
         ratingRepository.save(ratingToUpdate);
         sendUpdatedRating(ratingToUpdate);
     }
@@ -150,12 +148,12 @@ public class RatingServiceImpl implements RatingService {
     private void validateRating(RideResponse ride, Rating rating) {
         switch (rating.getUserRole()) {
             case DRIVER -> {
-                if (!Objects.equals(ride.getDriverId(), rating.getUserId())) {
+                if (!Objects.equals(ride.driverId(), rating.getUserId())) {
                     throw new IllegalArgumentException("Wrong user id for this ride!");
                 }
             }
             case PASSENGER -> {
-                if (!Objects.equals(ride.getPassengerId(), rating.getUserId())) {
+                if (!Objects.equals(ride.passengerId(), rating.getUserId())) {
                     throw new IllegalArgumentException("Wrong user id for this ride!");
                 }
             }

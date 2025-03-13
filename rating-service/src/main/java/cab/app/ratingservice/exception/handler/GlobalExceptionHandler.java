@@ -2,10 +2,7 @@ package cab.app.ratingservice.exception.handler;
 
 import cab.app.ratingservice.dto.response.exception.ExceptionDto;
 import cab.app.ratingservice.dto.response.exception.MultiException;
-import cab.app.ratingservice.exception.EntityNotFoundException;
-import cab.app.ratingservice.exception.RatingAlreadyExistException;
-import cab.app.ratingservice.exception.RatingNotFoundException;
-import cab.app.ratingservice.exception.RideNotCompletedException;
+import cab.app.ratingservice.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -46,6 +43,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ExceptionDto> handleEntityNotFoundException(EntityNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ExceptionDto.builder()
+                        .message(ex.getMessage())
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ExceptionDto> handleFeignBadRequestException(BadRequestException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ExceptionDto.builder()
+                        .message(ex.getMessage())
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(ExternalServerErrorException.class)
+    public ResponseEntity<ExceptionDto> handleExternalServerErrorException(ExternalServerErrorException ex){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 ExceptionDto.builder()
                         .message(ex.getMessage())
                         .build()
