@@ -1,7 +1,7 @@
 package com.example.driverservice.exception.handler;
 
-import com.example.driverservice.dto.response.ExceptionDto;
-import com.example.driverservice.dto.response.MultiException;
+import com.example.driverservice.dto.response.exception.ExceptionDto;
+import com.example.driverservice.dto.response.exception.MultiException;
 import com.example.driverservice.exception.EntityNotFoundException;
 import com.example.driverservice.exception.ResourceAlreadyTakenException;
 import org.springframework.http.HttpStatus;

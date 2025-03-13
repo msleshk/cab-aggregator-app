@@ -1,4 +1,4 @@
-package com.example.driverservice.dto.response;
+package com.example.driverservice.dto.response.exception;
 
 import lombok.Builder;
 

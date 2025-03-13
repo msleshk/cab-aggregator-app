@@ -30,8 +30,8 @@ public class DriverServiceImpl implements DriverService {
     @Transactional
     public void addDriver(DriverRequest driverDto) {
         checkIfDriverUnique(driverDto);
-        if (driverDto.getCarId() != null) {
-            checkIfCarTaken(driverDto.getCarId());
+        if (driverDto.carId() != null) {
+            checkIfCarTaken(driverDto.carId());
         }
         driverRepository.save(driverMapper.toEntity(driverDto));
     }
@@ -52,10 +52,10 @@ public class DriverServiceImpl implements DriverService {
 
         updateIfChanged(driverToUpdate, driverDto);
 
-        driverToUpdate.setName(driverDto.getName());
-        driverToUpdate.setEmail(driverDto.getEmail());
-        driverToUpdate.setPhoneNumber(driverDto.getPhoneNumber());
-        driverToUpdate.setGender(driverDto.getGender());
+        driverToUpdate.setName(driverDto.name());
+        driverToUpdate.setEmail(driverDto.email());
+        driverToUpdate.setPhoneNumber(driverDto.phoneNumber());
+        driverToUpdate.setGender(driverDto.gender());
 
         driverRepository.save(driverToUpdate);
     }
@@ -76,23 +76,23 @@ public class DriverServiceImpl implements DriverService {
     }
 
     private void updateIfChanged(Driver driverToUpdate, DriverRequest driverDto){
-        if (!driverToUpdate.getEmail().equals(driverDto.getEmail())) {
-            checkIfEmailUnique(driverDto.getEmail());
+        if (!driverToUpdate.getEmail().equals(driverDto.email())) {
+            checkIfEmailUnique(driverDto.email());
         }
-        if (!driverToUpdate.getPhoneNumber().equals(driverDto.getPhoneNumber())) {
-            checkIfPhoneUnique(driverDto.getPhoneNumber());
+        if (!driverToUpdate.getPhoneNumber().equals(driverDto.phoneNumber())) {
+            checkIfPhoneUnique(driverDto.phoneNumber());
         }
-        if (driverDto.getCarId() == null) {
+        if (driverDto.carId() == null) {
             driverToUpdate.setCar(null);
         } else {
-            checkIfCarTaken(driverDto.getCarId());
-            driverToUpdate.setCar(findCarById(driverDto.getCarId()));
+            checkIfCarTaken(driverDto.carId());
+            driverToUpdate.setCar(findCarById(driverDto.carId()));
         }
     }
 
     private void checkIfDriverUnique(DriverRequest driverRequest) {
-        checkIfEmailUnique(driverRequest.getEmail());
-        checkIfPhoneUnique(driverRequest.getPhoneNumber());
+        checkIfEmailUnique(driverRequest.email());
+        checkIfPhoneUnique(driverRequest.phoneNumber());
     }
 
     private void checkIfPhoneUnique(String phoneNumber) {
