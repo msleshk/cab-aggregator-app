@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,17 +38,17 @@ public class RideServiceImpl implements RideService {
     @Override
     @Transactional
     public void createRide(RideRequest rideRequest) {
-        validator.checkIfPassengerExist(rideRequest.getPassengerId());
+        validator.checkIfPassengerExist(rideRequest.passengerId());
         Ride ride = rideMapper.toEntity(rideRequest);
         if (ride.getDriverId() != null) {
-            validator.checkIfDriverExist(rideRequest.getDriverId());
+            validator.checkIfDriverExist(rideRequest.driverId());
             ride.setStatus(RideStatus.ACCEPTED);
         }
         else
             ride.setStatus(RideStatus.REQUESTED);
 
         ride.setOrderDateTime(LocalDateTime.now());
-        ride.setCost(costCalculator.generateCost(rideRequest.getDistance()));
+        ride.setCost(costCalculator.generateCost(rideRequest.distance()));
         rideRepository.save(ride);
     }
 
@@ -66,7 +67,7 @@ public class RideServiceImpl implements RideService {
         if (rideToUpdate.getStatus() == RideStatus.COMPLETED || rideToUpdate.getStatus() == RideStatus.CANCELLED) {
             throw new InvalidStatusException("You can't update ride with completed or cancelled status");
         }
-        if (rideRequest.getDriverId() != null)
+        if (rideRequest.driverId() != null)
             rideToUpdate.setStatus(RideStatus.ACCEPTED);
         else
             rideToUpdate.setStatus(RideStatus.REQUESTED);
@@ -153,14 +154,23 @@ public class RideServiceImpl implements RideService {
     }
 
     private Ride updateRideFromDto(Ride rideToUpdate, RideRequest rideRequest) {
-        // todo check driver and passenger existence, if new and old id are different
-        rideToUpdate.setDriverId(rideRequest.getPassengerId());
-        rideToUpdate.setPassengerId(rideRequest.getPassengerId());
-        rideToUpdate.setDepartureAddress(rideRequest.getDepartureAddress());
-        rideToUpdate.setArrivalAddress(rideRequest.getArrivalAddress());
+        if (!Objects.equals(rideToUpdate.getPassengerId(), rideRequest.passengerId())){
+            validator.checkIfPassengerExist(rideRequest.passengerId());
+            rideToUpdate.setPassengerId(rideRequest.passengerId());
+        }
+        if (!Objects.equals(rideToUpdate.getDriverId(), rideRequest.driverId())){
+            if (rideRequest.driverId() != null) {
+                validator.checkIfDriverExist(rideRequest.driverId());
+            } else {
+                rideToUpdate.setStatus(RideStatus.REQUESTED);
+            }
+            rideToUpdate.setDriverId(rideRequest.passengerId());
+        }
+        rideToUpdate.setDepartureAddress(rideRequest.departureAddress());
+        rideToUpdate.setArrivalAddress(rideRequest.arrivalAddress());
         rideToUpdate.setUpdatedAt(LocalDateTime.now());
-        rideToUpdate.setDistance(rideRequest.getDistance());
-        rideToUpdate.setCost(costCalculator.generateCost(rideRequest.getDistance()));
+        rideToUpdate.setDistance(rideRequest.distance());
+        rideToUpdate.setCost(costCalculator.generateCost(rideRequest.distance()));
 
         return rideToUpdate;
     }

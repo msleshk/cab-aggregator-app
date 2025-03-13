@@ -14,18 +14,10 @@ public class EntityValidator {
     private final PassengerClient passengerClient;
 
     public void checkIfDriverExist(Long id) {
-        try {
-            driverClient.getDriverById(id);
-        } catch (FeignException.NotFound ex) {
-            throw new EntityNotFoundException("Driver with id " + id + " not found. " + ex.getMessage());
-        }
+        driverClient.getDriverById(id);
     }
 
     public void checkIfPassengerExist(Long id) {
-        try {
-            passengerClient.getPassengerById(id);
-        } catch (FeignException.NotFound ex) {
-            throw new EntityNotFoundException("Passenger with id " + id + " not found. " + ex.getMessage());
-        }
+        passengerClient.getPassengerById(id);
     }
 }

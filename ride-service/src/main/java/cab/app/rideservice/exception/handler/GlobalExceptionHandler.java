@@ -1,11 +1,8 @@
 package cab.app.rideservice.exception.handler;
 
-import cab.app.rideservice.dto.response.ExceptionDto;
-import cab.app.rideservice.dto.response.MultiException;
-import cab.app.rideservice.exception.EntityNotFoundException;
-import cab.app.rideservice.exception.InvalidStatusException;
-import cab.app.rideservice.exception.RideNotFoundException;
-import feign.FeignException;
+import cab.app.rideservice.dto.response.exception.ExceptionDto;
+import cab.app.rideservice.dto.response.exception.MultiException;
+import cab.app.rideservice.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -34,7 +31,25 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ExceptionDto> handleEntityNotFoundException(EntityNotFoundException ex){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ExceptionDto.builder()
+                        .message(ex.getMessage())
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ExceptionDto> handleFeignBadRequestException(BadRequestException ex){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ExceptionDto.builder()
+                        .message(ex.getMessage())
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(ExternalServerErrorException.class)
+    public ResponseEntity<ExceptionDto> handleExternalServerErrorException(ExternalServerErrorException ex){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 ExceptionDto.builder()
                         .message(ex.getMessage())
                         .build()

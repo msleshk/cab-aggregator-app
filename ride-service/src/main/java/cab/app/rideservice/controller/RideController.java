@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/rides")
+@RequestMapping("/api/v1/rides")
 @RequiredArgsConstructor
 public class RideController {
 

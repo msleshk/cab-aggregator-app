@@ -1,4 +1,4 @@
-package cab.app.rideservice.dto.response;
+package cab.app.rideservice.dto.response.exception;
 
 import lombok.Builder;
 
