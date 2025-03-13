@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 
 @RestController
-@RequestMapping("/driver-balance")
+@RequestMapping("/api/v1/driver-balance")
 @RequiredArgsConstructor
 public class DriverBalanceController {
 
