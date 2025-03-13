@@ -1,4 +1,4 @@
-package com.example.passengerservice.dto.response;
+package com.example.passengerservice.dto.response.exception;
 
 import lombok.Builder;
 

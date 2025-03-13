@@ -30,8 +30,8 @@ public class PassengerServiceImpl implements PassengerService {
     @Override
     @Transactional
     public void addPassenger(PassengerRequest dto) {
-        checkIfEmailUnique(dto.getEmail());
-        checkIfPhoneUnique(dto.getPhoneNumber());
+        checkIfEmailUnique(dto.email());
+        checkIfPhoneUnique(dto.phoneNumber());
 
         Passenger passenger = passengerMapper.toEntity(dto);
 
@@ -45,7 +45,7 @@ public class PassengerServiceImpl implements PassengerService {
 
         updateIfChanged(passengerToUpdate, dto);
 
-        passengerToUpdate.setName(dto.getName());
+        passengerToUpdate.setName(dto.name());
 
         passengerRepository.save(passengerToUpdate);
     }
@@ -74,14 +74,14 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     private void updateIfChanged(Passenger passengerToUpdate, PassengerRequest dto){
-        if (!passengerToUpdate.getEmail().equals(dto.getEmail())) {
-            checkIfEmailUnique(dto.getEmail());
-            passengerToUpdate.setEmail(dto.getEmail());
+        if (!passengerToUpdate.getEmail().equals(dto.email())) {
+            checkIfEmailUnique(dto.email());
+            passengerToUpdate.setEmail(dto.email());
         }
 
-        if (!passengerToUpdate.getPhoneNumber().equals(dto.getPhoneNumber())) {
-            checkIfPhoneUnique(dto.getPhoneNumber());
-            passengerToUpdate.setPhoneNumber(dto.getPhoneNumber());
+        if (!passengerToUpdate.getPhoneNumber().equals(dto.phoneNumber())) {
+            checkIfPhoneUnique(dto.phoneNumber());
+            passengerToUpdate.setPhoneNumber(dto.phoneNumber());
         }
     }
 

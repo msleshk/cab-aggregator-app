@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/passengers")
+@RequestMapping("/api/v1/passengers")
 @RequiredArgsConstructor
 public class PassengerController {
     private final PassengerService passengerService;
