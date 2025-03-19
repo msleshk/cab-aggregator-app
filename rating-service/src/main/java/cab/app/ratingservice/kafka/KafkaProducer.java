@@ -17,16 +17,11 @@ public class KafkaProducer {
     public void sendPassengerAvgRating(AverageRating passengerAvgRating){
         kafkaTemplate.send(PASSENGER_TOPIC, passengerAvgRating);
         System.out.println("Sending message");
-        logger(passengerAvgRating);
     }
 
     public void sendDriverAvgTaring(AverageRating driverAvgRating){
         kafkaTemplate.send(DRIVER_TOPIC, driverAvgRating);
         System.out.println("sending message");
-        logger(driverAvgRating);
     }
 
-    private void logger(AverageRating avgRatingResponse){
-        log.info("Send message{}", avgRatingResponse);
-    }
 }
