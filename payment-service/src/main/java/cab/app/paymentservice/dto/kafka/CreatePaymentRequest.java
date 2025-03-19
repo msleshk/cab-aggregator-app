@@ -1,4 +1,4 @@
-package cab.app.paymentservice.dto.request;
+package cab.app.paymentservice.dto.kafka;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

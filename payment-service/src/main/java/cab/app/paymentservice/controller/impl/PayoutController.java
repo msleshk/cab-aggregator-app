@@ -1,25 +1,23 @@
-package cab.app.paymentservice.controller;
+package cab.app.paymentservice.controller.impl;
 
+import cab.app.paymentservice.controller.PayoutApi;
 import cab.app.paymentservice.dto.request.PayoutRequest;
 import cab.app.paymentservice.dto.response.PayoutResponse;
 import cab.app.paymentservice.service.PayoutService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/payout")
 @RequiredArgsConstructor
-public class PayoutController {
+public class PayoutController implements PayoutApi {
 
     private final PayoutService payoutService;
 
-    @PostMapping
-    public ResponseEntity<PayoutResponse> getPayout(@RequestBody @Valid PayoutRequest payoutRequest) {
+    @Override
+    public ResponseEntity<PayoutResponse> getPayout(PayoutRequest payoutRequest) {
         return ResponseEntity.ok().body(payoutService.createPayout(payoutRequest));
     }
 }
+

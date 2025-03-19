@@ -1,6 +1,6 @@
 package cab.app.paymentservice.util;
 
-import cab.app.paymentservice.dto.request.CreatePaymentRequest;
+import cab.app.paymentservice.dto.kafka.CreatePaymentRequest;
 import cab.app.paymentservice.dto.response.PaymentResponse;
 import cab.app.paymentservice.model.Payment;
 import org.mapstruct.Mapper;

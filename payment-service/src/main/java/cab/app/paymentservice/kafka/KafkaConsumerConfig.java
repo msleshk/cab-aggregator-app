@@ -23,7 +23,7 @@ public class KafkaConsumerConfig {
     private String kafkaServer;
 
     @Bean
-    public ConsumerFactory<String, Object> consumerFactory(){
+    public ConsumerFactory<String, Object> consumerFactory() {
         HashMap<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaServer);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, PAYMENT_GROUP);
@@ -32,12 +32,12 @@ public class KafkaConsumerConfig {
         props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class);
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
         props.put(JsonDeserializer.TRUSTED_PACKAGES, TRUSTED_PACKAGES);
-        props.put(JsonDeserializer.TYPE_MAPPINGS, DESERIALIZE_PAYMENT_REQUEST);
+        props.put(JsonDeserializer.TYPE_MAPPINGS, DESERIALIZE_TYPE_MAPPINGS);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(){
+    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, Object> listenerFactory = new ConcurrentKafkaListenerContainerFactory<>();
         listenerFactory.setConsumerFactory(consumerFactory());
         return listenerFactory;

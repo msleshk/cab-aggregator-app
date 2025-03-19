@@ -1,6 +1,6 @@
 package cab.app.paymentservice.service.implementation;
 
-import cab.app.paymentservice.dto.request.CreatePaymentRequest;
+import cab.app.paymentservice.dto.kafka.CreatePaymentRequest;
 import cab.app.paymentservice.dto.request.PayRequest;
 import cab.app.paymentservice.dto.response.PayResponse;
 import cab.app.paymentservice.dto.response.PaymentResponse;
@@ -12,6 +12,7 @@ import cab.app.paymentservice.model.enums.PaymentStatus;
 import cab.app.paymentservice.repository.PaymentRepository;
 import cab.app.paymentservice.repository.PromoCodeRepository;
 import cab.app.paymentservice.service.DriverBalanceService;
+import cab.app.paymentservice.service.PassengerBalanceService;
 import cab.app.paymentservice.service.PaymentService;
 import cab.app.paymentservice.util.PaymentMapper;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentMapper paymentMapper;
     private final PromoCodeRepository promoCodeRepository;
     private final DriverBalanceService driverBalanceService;
+    private final PassengerBalanceService passengerBalanceService;
 
     @Override
     @Transactional
@@ -42,12 +44,10 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setCreatedAt(LocalDateTime.now());
         payment.setStatus(PaymentStatus.PENDING);
 
-        driverBalanceService.createDriverBalance(payment.getDriverId());
-
         paymentRepository.save(payment);
     }
 
-    private void validatePayment(CreatePaymentRequest paymentRequest){
+    private void validatePayment(CreatePaymentRequest paymentRequest) {
         if (paymentRepository.findByRideId(paymentRequest.driverId()).isPresent()) {
             throw new PaymentAlreadyExistException("Payment for this ride already exist!");
         }
@@ -72,6 +72,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (!payment.getPassengerId().equals(payRequest.passengerId())) {
             throw new IllegalArgumentException("Wrong passenger id!");
         }
+        passengerBalanceService.withdrawFromPassengerBalance(payRequest.passengerId(), finalAmount);
         payment.setStatus(PaymentStatus.PAID);
         payment.setFinalCost(finalAmount);
         paymentRepository.save(payment);
@@ -118,7 +119,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (!promoCode.isActive()) {
             throw new PromoCodeNotActiveException("Promo code is not active");
         }
-        BigDecimal discount = finalAmount.multiply(BigDecimal.valueOf(promoCode.getDiscountAmount()/100));
+        BigDecimal discount = finalAmount.multiply(BigDecimal.valueOf(promoCode.getDiscountAmount() / 100));
         finalAmount = finalAmount.subtract(discount);
         if (finalAmount.compareTo(BigDecimal.ZERO) < 0) {
             finalAmount = BigDecimal.ZERO;
