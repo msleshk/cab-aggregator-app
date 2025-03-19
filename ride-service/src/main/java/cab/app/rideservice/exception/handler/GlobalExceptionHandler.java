@@ -47,6 +47,24 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(DriverAlreadyAssignedException.class)
+    public ResponseEntity<ExceptionDto> handleDriverAlreadyAssignedException(DriverAlreadyAssignedException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ExceptionDto.builder()
+                        .message(ex.getMessage())
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(DriverNotValidException.class)
+    public ResponseEntity<ExceptionDto> handleDriverNotValidException(DriverNotValidException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ExceptionDto.builder()
+                        .message(ex.getMessage())
+                        .build()
+        );
+    }
+
     @ExceptionHandler(ExternalServerErrorException.class)
     public ResponseEntity<ExceptionDto> handleExternalServerErrorException(ExternalServerErrorException ex){
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(

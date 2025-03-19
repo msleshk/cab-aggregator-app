@@ -5,10 +5,7 @@ import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
 
-public record RideRequest(
-        @NotNull(message = "Passenger id cannot not be null!")
-        @Positive(message = "Passenger id cannot be less than 0!")
-        Long passengerId,
+public record RideToUpdate(
         @NotNull(message = "Departure address cannot not be null!")
         String departureAddress,
         @NotNull(message = "Arrival address cannot be null!")

@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
 
-import static cab.app.rideservice.kafka.util.Constants.PAYMENT_TOPIC;
+import static cab.app.rideservice.kafka.util.Constants.*;
 
 @Configuration
 public class KafkaTopic {
@@ -15,6 +15,13 @@ public class KafkaTopic {
     @Bean
     public NewTopic newPaymentTopic() {
         return TopicBuilder.name(PAYMENT_TOPIC)
+                .partitions(partitionCount)
+                .build();
+    }
+
+    @Bean
+    public NewTopic newDriverTopic(){
+        return TopicBuilder.name(DRIVER_STATUS_TOPIC)
                 .partitions(partitionCount)
                 .build();
     }
