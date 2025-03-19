@@ -1,12 +1,15 @@
 package com.example.driverservice.service.implementation;
 
+import com.example.driverservice.dto.kafka.NewDriverBalance;
 import com.example.driverservice.dto.response.ResponseList;
 import com.example.driverservice.dto.request.DriverRequest;
 import com.example.driverservice.dto.response.DriverResponse;
 import com.example.driverservice.exception.EntityNotFoundException;
 import com.example.driverservice.exception.ResourceAlreadyTakenException;
+import com.example.driverservice.kafka.producer.KafkaProducer;
 import com.example.driverservice.model.Car;
 import com.example.driverservice.model.Driver;
+import com.example.driverservice.model.enums.DriverStatus;
 import com.example.driverservice.repository.CarRepository;
 import com.example.driverservice.repository.DriverRepository;
 import com.example.driverservice.service.DriverService;
@@ -25,6 +28,7 @@ public class DriverServiceImpl implements DriverService {
     private final DriverRepository driverRepository;
     private final CarRepository carRepository;
     private final DriverMapper driverMapper;
+    private final KafkaProducer kafkaProducer;
 
     @Override
     @Transactional
@@ -33,7 +37,12 @@ public class DriverServiceImpl implements DriverService {
         if (driverDto.carId() != null) {
             checkIfCarTaken(driverDto.carId());
         }
-        driverRepository.save(driverMapper.toEntity(driverDto));
+        Driver newDriver = driverMapper.toEntity(driverDto);
+        newDriver.setDriverStatus(DriverStatus.AVAILABLE);
+        driverRepository.save(newDriver);
+        kafkaProducer.sendNewDriverBalance(NewDriverBalance.builder()
+                .id(newDriver.getId())
+                .build());
     }
 
     @Override

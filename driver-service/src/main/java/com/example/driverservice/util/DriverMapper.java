@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface DriverMapper {
     @Mapping(source = "car.id", target = "carId")
+    @Mapping(source = "driverStatus", target = "status")
     DriverResponse toDto(Driver driver);
 
     @Mapping(target = "car", ignore = true)

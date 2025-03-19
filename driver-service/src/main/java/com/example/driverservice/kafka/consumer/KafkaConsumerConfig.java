@@ -1,4 +1,4 @@
-package com.example.driverservice.kafka;
+package com.example.driverservice.kafka.consumer;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -32,7 +32,7 @@ public class KafkaConsumerConfig {
         props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class);
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
         props.put(JsonDeserializer.TRUSTED_PACKAGES, TRUSTED_PACKAGES);
-        props.put(JsonDeserializer.TYPE_MAPPINGS, DESERIALIZE_AVG_RATING);
+        props.put(JsonDeserializer.TYPE_MAPPINGS, DRIVER_DESERIALIZE_TYPE_MAPPINGS);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 

@@ -1,5 +1,6 @@
 package com.example.driverservice.model;
 
+import com.example.driverservice.model.enums.DriverStatus;
 import com.example.driverservice.model.enums.Gender;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,9 @@ public class Driver {
     private String phoneNumber;
     @Column(name = "gender")
     private Gender gender;
+    @Column(name = "driver_status")
+    @Enumerated(EnumType.STRING)
+    private DriverStatus driverStatus;
     @Column(name = "average_rating")
     private Double averageRating;
     @OneToOne
