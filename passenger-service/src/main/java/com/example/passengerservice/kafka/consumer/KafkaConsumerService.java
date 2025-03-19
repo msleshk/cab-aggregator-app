@@ -1,4 +1,4 @@
-package com.example.passengerservice.kafka;
+package com.example.passengerservice.kafka.consumer;
 
 import com.example.passengerservice.dto.kafka.AverageRatingResponse;
 import com.example.passengerservice.exception.PassengerNotFoundException;
@@ -20,7 +20,6 @@ public class KafkaConsumerService {
         Passenger passenger = findPassengerById(ratingResponse.id());
         passenger.setAverageRating(ratingResponse.avgRating());
         passengerRepository.save(passenger);
-        System.out.println("Passenger updated id, avg rating:" + passenger.getId() + passenger.getAverageRating() ); //todo delete later
     }
 
     private Passenger findPassengerById(Long id){

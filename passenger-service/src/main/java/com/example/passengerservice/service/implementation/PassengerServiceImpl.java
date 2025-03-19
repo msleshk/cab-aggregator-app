@@ -1,11 +1,13 @@
 package com.example.passengerservice.service.implementation;
 
+import com.example.passengerservice.dto.kafka.NewPassengerBalance;
 import com.example.passengerservice.dto.request.PassengerRequest;
 import com.example.passengerservice.dto.response.PassengerResponse;
 import com.example.passengerservice.dto.response.PassengerResponseList;
 import com.example.passengerservice.exception.EmailAlreadyTakenException;
 import com.example.passengerservice.exception.PassengerNotFoundException;
 import com.example.passengerservice.exception.PhoneNumberAlreadyTakenException;
+import com.example.passengerservice.kafka.producer.KafkaProducer;
 import com.example.passengerservice.model.Passenger;
 import com.example.passengerservice.repository.PassengerRepository;
 import com.example.passengerservice.service.PassengerService;
@@ -26,6 +28,7 @@ public class PassengerServiceImpl implements PassengerService {
 
     private final PassengerRepository passengerRepository;
     private final PassengerMapper passengerMapper;
+    private final KafkaProducer kafkaProducer;
 
     @Override
     @Transactional
@@ -36,6 +39,9 @@ public class PassengerServiceImpl implements PassengerService {
         Passenger passenger = passengerMapper.toEntity(dto);
 
         passengerRepository.save(passenger);
+        kafkaProducer.sendNewPassengerBalance(NewPassengerBalance.builder()
+                .id(passenger.getId())
+                .build());
     }
 
     @Override
