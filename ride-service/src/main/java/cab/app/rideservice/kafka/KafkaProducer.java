@@ -6,7 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import static cab.app.rideservice.kafka.util.Constants.*;
+import static cab.app.rideservice.kafka.util.Constants.DRIVER_STATUS_TOPIC;
+import static cab.app.rideservice.kafka.util.Constants.PAYMENT_TOPIC;
 
 @Component
 @RequiredArgsConstructor
