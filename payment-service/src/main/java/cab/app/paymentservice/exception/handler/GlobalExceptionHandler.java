@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PaymentAlreadyExistException.class)
     public ResponseEntity<ExceptionDto> handlePaymentAlreadyExistException(PaymentAlreadyExistException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
                 ExceptionDto.builder()
                         .message(ex.getMessage())
                         .build()
