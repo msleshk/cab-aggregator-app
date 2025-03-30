@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/changeset/V1_create_promo_codes_table.yml
   - include:
       file: db/changelog/changeset/V1_set_promo_codes_data.yml
+  - include:
+      file: db/changelog/changeset/V1_create_passenger_balance_table.yml

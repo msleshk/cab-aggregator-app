@@ -1,16 +1,8 @@
 package cab.app.ratingservice.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class ResponseList<T> {
-    private List<T> responseList;
+public record ResponseList<T>(
+        List<T> responseList
+) {
 }

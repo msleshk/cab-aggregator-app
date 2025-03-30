@@ -1,12 +1,15 @@
 package com.example.driverservice.service.implementation;
 
+import com.example.driverservice.dto.kafka.NewDriverBalance;
 import com.example.driverservice.dto.response.ResponseList;
 import com.example.driverservice.dto.request.DriverRequest;
 import com.example.driverservice.dto.response.DriverResponse;
 import com.example.driverservice.exception.EntityNotFoundException;
 import com.example.driverservice.exception.ResourceAlreadyTakenException;
+import com.example.driverservice.kafka.producer.KafkaProducer;
 import com.example.driverservice.model.Car;
 import com.example.driverservice.model.Driver;
+import com.example.driverservice.model.enums.DriverStatus;
 import com.example.driverservice.repository.CarRepository;
 import com.example.driverservice.repository.DriverRepository;
 import com.example.driverservice.service.DriverService;
@@ -25,15 +28,21 @@ public class DriverServiceImpl implements DriverService {
     private final DriverRepository driverRepository;
     private final CarRepository carRepository;
     private final DriverMapper driverMapper;
+    private final KafkaProducer kafkaProducer;
 
     @Override
     @Transactional
     public void addDriver(DriverRequest driverDto) {
         checkIfDriverUnique(driverDto);
-        if (driverDto.getCarId() != null) {
-            checkIfCarTaken(driverDto.getCarId());
+        if (driverDto.carId() != null) {
+            checkIfCarTaken(driverDto.carId());
         }
-        driverRepository.save(driverMapper.toEntity(driverDto));
+        Driver newDriver = driverMapper.toEntity(driverDto);
+        newDriver.setDriverStatus(DriverStatus.AVAILABLE);
+        driverRepository.save(newDriver);
+        kafkaProducer.sendNewDriverBalance(NewDriverBalance.builder()
+                .id(newDriver.getId())
+                .build());
     }
 
     @Override
@@ -52,10 +61,10 @@ public class DriverServiceImpl implements DriverService {
 
         updateIfChanged(driverToUpdate, driverDto);
 
-        driverToUpdate.setName(driverDto.getName());
-        driverToUpdate.setEmail(driverDto.getEmail());
-        driverToUpdate.setPhoneNumber(driverDto.getPhoneNumber());
-        driverToUpdate.setGender(driverDto.getGender());
+        driverToUpdate.setName(driverDto.name());
+        driverToUpdate.setEmail(driverDto.email());
+        driverToUpdate.setPhoneNumber(driverDto.phoneNumber());
+        driverToUpdate.setGender(driverDto.gender());
 
         driverRepository.save(driverToUpdate);
     }
@@ -76,23 +85,23 @@ public class DriverServiceImpl implements DriverService {
     }
 
     private void updateIfChanged(Driver driverToUpdate, DriverRequest driverDto){
-        if (!driverToUpdate.getEmail().equals(driverDto.getEmail())) {
-            checkIfEmailUnique(driverDto.getEmail());
+        if (!driverToUpdate.getEmail().equals(driverDto.email())) {
+            checkIfEmailUnique(driverDto.email());
         }
-        if (!driverToUpdate.getPhoneNumber().equals(driverDto.getPhoneNumber())) {
-            checkIfPhoneUnique(driverDto.getPhoneNumber());
+        if (!driverToUpdate.getPhoneNumber().equals(driverDto.phoneNumber())) {
+            checkIfPhoneUnique(driverDto.phoneNumber());
         }
-        if (driverDto.getCarId() == null) {
+        if (driverDto.carId() == null) {
             driverToUpdate.setCar(null);
         } else {
-            checkIfCarTaken(driverDto.getCarId());
-            driverToUpdate.setCar(findCarById(driverDto.getCarId()));
+            checkIfCarTaken(driverDto.carId());
+            driverToUpdate.setCar(findCarById(driverDto.carId()));
         }
     }
 
     private void checkIfDriverUnique(DriverRequest driverRequest) {
-        checkIfEmailUnique(driverRequest.getEmail());
-        checkIfPhoneUnique(driverRequest.getPhoneNumber());
+        checkIfEmailUnique(driverRequest.email());
+        checkIfPhoneUnique(driverRequest.phoneNumber());
     }
 
     private void checkIfPhoneUnique(String phoneNumber) {

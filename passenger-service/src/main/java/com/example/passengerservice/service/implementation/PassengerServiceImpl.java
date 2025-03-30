@@ -1,11 +1,13 @@
 package com.example.passengerservice.service.implementation;
 
+import com.example.passengerservice.dto.kafka.NewPassengerBalance;
 import com.example.passengerservice.dto.request.PassengerRequest;
 import com.example.passengerservice.dto.response.PassengerResponse;
 import com.example.passengerservice.dto.response.PassengerResponseList;
 import com.example.passengerservice.exception.EmailAlreadyTakenException;
 import com.example.passengerservice.exception.PassengerNotFoundException;
 import com.example.passengerservice.exception.PhoneNumberAlreadyTakenException;
+import com.example.passengerservice.kafka.producer.KafkaProducer;
 import com.example.passengerservice.model.Passenger;
 import com.example.passengerservice.repository.PassengerRepository;
 import com.example.passengerservice.service.PassengerService;
@@ -26,16 +28,20 @@ public class PassengerServiceImpl implements PassengerService {
 
     private final PassengerRepository passengerRepository;
     private final PassengerMapper passengerMapper;
+    private final KafkaProducer kafkaProducer;
 
     @Override
     @Transactional
     public void addPassenger(PassengerRequest dto) {
-        checkIfEmailUnique(dto.getEmail());
-        checkIfPhoneUnique(dto.getPhoneNumber());
+        checkIfEmailUnique(dto.email());
+        checkIfPhoneUnique(dto.phoneNumber());
 
         Passenger passenger = passengerMapper.toEntity(dto);
 
         passengerRepository.save(passenger);
+        kafkaProducer.sendNewPassengerBalance(NewPassengerBalance.builder()
+                .id(passenger.getId())
+                .build());
     }
 
     @Override
@@ -45,7 +51,7 @@ public class PassengerServiceImpl implements PassengerService {
 
         updateIfChanged(passengerToUpdate, dto);
 
-        passengerToUpdate.setName(dto.getName());
+        passengerToUpdate.setName(dto.name());
 
         passengerRepository.save(passengerToUpdate);
     }
@@ -74,14 +80,14 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     private void updateIfChanged(Passenger passengerToUpdate, PassengerRequest dto){
-        if (!passengerToUpdate.getEmail().equals(dto.getEmail())) {
-            checkIfEmailUnique(dto.getEmail());
-            passengerToUpdate.setEmail(dto.getEmail());
+        if (!passengerToUpdate.getEmail().equals(dto.email())) {
+            checkIfEmailUnique(dto.email());
+            passengerToUpdate.setEmail(dto.email());
         }
 
-        if (!passengerToUpdate.getPhoneNumber().equals(dto.getPhoneNumber())) {
-            checkIfPhoneUnique(dto.getPhoneNumber());
-            passengerToUpdate.setPhoneNumber(dto.getPhoneNumber());
+        if (!passengerToUpdate.getPhoneNumber().equals(dto.phoneNumber())) {
+            checkIfPhoneUnique(dto.phoneNumber());
+            passengerToUpdate.setPhoneNumber(dto.phoneNumber());
         }
     }
 

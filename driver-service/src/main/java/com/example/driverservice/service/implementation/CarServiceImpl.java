@@ -55,10 +55,10 @@ public class CarServiceImpl implements CarService {
 
         updateIfChanged(carToUpdate, carDto);
 
-        carToUpdate.setCarNumber(carDto.getCarNumber());
-        carToUpdate.setBrand(carDto.getBrand());
-        carToUpdate.setModel(carDto.getModel());
-        carToUpdate.setColor(carDto.getColor());
+        carToUpdate.setCarNumber(carDto.carNumber());
+        carToUpdate.setBrand(carDto.brand());
+        carToUpdate.setModel(carDto.model());
+        carToUpdate.setColor(carDto.color());
 
         carRepository.save(carToUpdate);
     }
@@ -86,13 +86,13 @@ public class CarServiceImpl implements CarService {
     }
 
     private void updateIfChanged(Car carToUpdate, CarRequest carDto){
-        if (!carToUpdate.getCarNumber().equals(carDto.getCarNumber())) {
+        if (!carToUpdate.getCarNumber().equals(carDto.carNumber())) {
             checkIfCarUnique(carDto);
         }
     }
 
     private void checkIfCarUnique(CarRequest carRequest) {
-        if (carRepository.findCarByCarNumberAndDeletedFalse(carRequest.getCarNumber()).isPresent()) {
+        if (carRepository.findCarByCarNumberAndDeletedFalse(carRequest.carNumber()).isPresent()) {
             throw new ResourceAlreadyTakenException("This car number already taken!");
         }
     }
