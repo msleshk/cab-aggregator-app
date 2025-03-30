@@ -15,7 +15,7 @@ import java.util.HashMap;
 public class GlobalExceptionHandler {
     @ExceptionHandler(RatingAlreadyExistException.class)
     public ResponseEntity<ExceptionDto> handleRatingAlreadyExistException(RatingAlreadyExistException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
                 ExceptionDto.builder()
                         .message(ex.getMessage())
                         .build()
