@@ -40,9 +40,9 @@ public class DriverServiceImpl implements DriverService {
         Driver newDriver = driverMapper.toEntity(driverDto);
         newDriver.setDriverStatus(DriverStatus.AVAILABLE);
         driverRepository.save(newDriver);
-        kafkaProducer.sendNewDriverBalance(NewDriverBalance.builder()
-                .id(newDriver.getId())
-                .build());
+//        kafkaProducer.sendNewDriverBalance(NewDriverBalance.builder()
+//                .id(newDriver.getId())
+//                .build());
     }
 
     @Override
