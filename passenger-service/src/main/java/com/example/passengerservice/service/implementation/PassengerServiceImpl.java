@@ -39,9 +39,9 @@ public class PassengerServiceImpl implements PassengerService {
         Passenger passenger = passengerMapper.toEntity(dto);
 
         passengerRepository.save(passenger);
-//        kafkaProducer.sendNewPassengerBalance(NewPassengerBalance.builder()
-//                .id(passenger.getId())
-//                .build());
+        kafkaProducer.sendNewPassengerBalance(NewPassengerBalance.builder()
+                .id(passenger.getId())
+                .build());
     }
 
     @Override

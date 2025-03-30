@@ -103,18 +103,6 @@ public class RatingIntegrationTest {
         doNothing().when(validator).checkIfUserExist(request.userId(), Role.valueOf(request.userRole()));
         when(validator.getRideById(request.rideId())).thenReturn(rideResponse);
 
-//        String response =
-//                given()
-//                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                        .body(objectMapper.writeValueAsString(request))
-//                        .when()
-//                        .post(CREATE_RATING)
-//                        .then()
-//                        .extract()
-//                        .asString();
-//
-//        System.out.println("Response JSON: " + response);
-
         given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(objectMapper.writeValueAsString(request))
