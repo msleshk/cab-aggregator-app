@@ -1,12 +1,12 @@
 package cab.app.rideservice.service.implementation;
 
 import cab.app.rideservice.dto.kafka.CreatePayment;
+import cab.app.rideservice.dto.kafka.UpdateDriverStatus;
 import cab.app.rideservice.dto.request.RideRequest;
 import cab.app.rideservice.dto.request.RideToUpdate;
 import cab.app.rideservice.dto.response.DriverResponse;
 import cab.app.rideservice.dto.response.ResponseList;
 import cab.app.rideservice.dto.response.RideResponse;
-import cab.app.rideservice.dto.kafka.UpdateDriverStatus;
 import cab.app.rideservice.exception.BadRequestException;
 import cab.app.rideservice.exception.DriverNotValidException;
 import cab.app.rideservice.exception.InvalidStatusException;

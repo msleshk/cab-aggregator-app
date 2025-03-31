@@ -5,7 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
 
-import static cab.app.rideservice.kafka.util.Constants.*;
+import static cab.app.rideservice.kafka.util.Constants.DRIVER_STATUS_TOPIC;
+import static cab.app.rideservice.kafka.util.Constants.PAYMENT_TOPIC;
 
 @Configuration
 public class KafkaTopic {

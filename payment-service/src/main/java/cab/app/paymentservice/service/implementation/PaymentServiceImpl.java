@@ -48,7 +48,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void validatePayment(CreatePaymentRequest paymentRequest) {
-        if (paymentRepository.findByRideId(paymentRequest.driverId()).isPresent()) {
+        if (paymentRepository.findByRideId(paymentRequest.rideId()).isPresent()) {
             throw new PaymentAlreadyExistException("Payment for this ride already exist!");
         }
     }
