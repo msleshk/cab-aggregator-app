@@ -58,7 +58,6 @@ class PaymentServiceImplTest {
     @Test
     void shouldCreatePayment() {
         CreatePaymentRequest request = mock(CreatePaymentRequest.class);
-        when(request.driverId()).thenReturn(DRIVER_ID);
 
         when(paymentRepository.findByRideId(anyLong())).thenReturn(Optional.empty());
         when(paymentMapper.toEntity(request)).thenReturn(payment);
