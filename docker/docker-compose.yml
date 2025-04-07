@@ -1,61 +1,71 @@
 services:
   passenger-service:
     build:
-      context: ./passenger-service
-      dockerfile: Dockerfile
+      context: ../passenger-service
+      dockerfile: ../passenger-service/Dockerfile
     container_name: passenger-service
     ports:
       - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - PASSENGER_DB_URL=${PASSENGER_DB_URL}
     depends_on:
       - kafka
+      - passenger_db
 
   driver-service:
     build:
-      context: ./driver-service
-      dockerfile: Dockerfile
+      context: ../driver-service
+      dockerfile: ../driver-service/Dockerfile
     container_name: driver-service
     ports:
       - "8084:8084"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DRIVER_DB_URL=${DRIVER_DB_URL}
     depends_on:
       - kafka
+      - driver_db
 
   ride-service:
     build:
-      context: ./ride-service
-      dockerfile: Dockerfile
+      context: ../ride-service
+      dockerfile: ../ride-service/Dockerfile
     container_name: ride-service
     ports:
       - "8082:8082"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - RIDE_DB_URL=${RIDE_DB_URL}
     depends_on:
       - kafka
+      - ride_db
 
   payment-service:
     build:
-      context: ./payment-service
-      dockerfile: Dockerfile
+      context: ../payment-service
+      dockerfile: ../payment-service/Dockerfile
     container_name: payment-service
     ports:
       - "8085:8085"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - PAYMENT_DB_URL=${PAYMENT_DB_URL}
     depends_on:
       - kafka
+      - payment_db
 
   rating-service:
     build:
-      context: ./rating-service
-      dockerfile: Dockerfile
+      context: ../rating-service
+      dockerfile: ../rating-service/Dockerfile
     container_name: rating-service
     ports:
       - "8083:8083"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       - kafka
       - mongodb
@@ -103,10 +113,66 @@ services:
     ports:
       - "8081:8081"
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_DB_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_DB_PASSWORD}
       ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb:27017/
+
+  passenger_db:
+    image: postgres:latest
+    container_name: passenger_db
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: passenger_db
+    ports:
+      - '5431:5432'
+    volumes:
+      - pg_passenger:/var/lib/postgresql/data
+
+  driver_db:
+    image: postgres:latest
+    container_name: driver_db
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: driver_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - pg_driver:/var/lib/postgresql/data
+
+  ride_db:
+    image: postgres:latest
+    container_name: ride_db
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ride_db
+    ports:
+      - '5433:5432'
+    volumes:
+      - pg_ride:/var/lib/postgresql/data
+
+  payment_db:
+    image: postgres:latest
+    container_name: payment_db
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: payment_db
+    ports:
+      - '5434:5432'
+    volumes:
+      - pg_payment:/var/lib/postgresql/data
 
 volumes:
     mongodb_data:
+      driver: local
+    pg_passenger:
+      driver: local
+    pg_driver:
+      driver: local
+    pg_ride:
+      driver: local
+    pg_payment:
       driver: local
