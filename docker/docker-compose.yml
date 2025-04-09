@@ -4,8 +4,8 @@ services:
       context: ../passenger-service
       dockerfile: ../passenger-service/Dockerfile
     container_name: passenger-service
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     environment:
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
@@ -21,8 +21,8 @@ services:
       context: ../driver-service
       dockerfile: ../driver-service/Dockerfile
     container_name: driver-service
-    ports:
-      - "8084:8084"
+    expose:
+      - "8084"
     environment:
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
@@ -38,8 +38,8 @@ services:
       context: ../ride-service
       dockerfile: ../ride-service/Dockerfile
     container_name: ride-service
-    ports:
-      - "8082:8082"
+    expose:
+      - "8082"
     environment:
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
@@ -55,8 +55,8 @@ services:
       context: ../payment-service
       dockerfile: ../payment-service/Dockerfile
     container_name: payment-service
-    ports:
-      - "8085:8085"
+    expose:
+      - "8085"
     environment:
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
@@ -72,21 +72,31 @@ services:
       context: ../rating-service
       dockerfile: ../rating-service/Dockerfile
     container_name: rating-service
-    ports:
-      - "8083:8083"
+    expose:
+      - "8083"
     depends_on:
       - kafka
       - mongodb
     networks:
       - cab-aggregator-app
 
-  eureka:
+  discovery-service:
     build:
       context: ../discovery-service
       dockerfile: ../discovery-service/Dockerfile
     container_name: discovery-service
     ports:
       - "8761:8761"
+    networks:
+      - cab-aggregator-app
+
+  gateway-service:
+    build:
+      context: ../gateway-service
+      dockerfile: ../gateway-service/Dockerfile
+    container_name: gateway-service
+    ports:
+      - "8888:8888"
     networks:
       - cab-aggregator-app
 
