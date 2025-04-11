@@ -1,0 +1,12 @@
+version: "3.8"
+
+volumes:
+  mongodb_data:
+  pg_passenger:
+  pg_driver:
+  pg_ride:
+  pg_payment:
+
+networks:
+  cab-aggregator-app:
+    driver: bridge
