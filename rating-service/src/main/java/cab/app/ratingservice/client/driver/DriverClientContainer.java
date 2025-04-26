@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class DriverClientContainer {
 
-    private final DriverClientContainer driverClient;
+    private final DriverClient driverClient;
 
     @CircuitBreaker(name = "driverClient", fallbackMethod = "fallback")
     public void getDriverById(Long id) {
