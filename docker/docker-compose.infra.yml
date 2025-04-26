@@ -1,6 +1,6 @@
 services:
   zookeeper:
-    image: bitnami/zookeeper:latest
+    image: bitnami/zookeeper:3.9.0
     container_name: zookeeper
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
@@ -8,9 +8,14 @@ services:
       - "2181:2181"
     networks:
       - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 256mb
+          cpus: 0.25
 
   kafka:
-    image: bitnami/kafka:latest
+    image: bitnami/kafka:3.9.0
     container_name: kafka
     depends_on:
       - zookeeper
@@ -27,6 +32,11 @@ services:
       - ALLOW_PLAINTEXT_LISTENER=yes
     networks:
       - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+          cpus: 0.50
 
   discovery-service:
     build:
@@ -37,6 +47,11 @@ services:
       - "8761:8761"
     networks:
       - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+          cpus: 0.50
 
   gateway-service:
     build:
@@ -47,3 +62,8 @@ services:
       - "8888:8888"
     networks:
       - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+          cpus: 0.50

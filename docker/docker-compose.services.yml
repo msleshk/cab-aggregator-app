@@ -13,8 +13,14 @@ services:
     depends_on:
       - kafka
       - passenger_db
+      - logstash
     networks:
       - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+          cpus: 0.50
 
   driver-service:
     build:
@@ -30,8 +36,14 @@ services:
     depends_on:
       - kafka
       - driver_db
+      - logstash
     networks:
       - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+          cpus: 0.50
 
   ride-service:
     build:
@@ -47,8 +59,14 @@ services:
     depends_on:
       - kafka
       - ride_db
+      - logstash
     networks:
       - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+          cpus: 0.50
 
   payment-service:
     build:
@@ -64,8 +82,14 @@ services:
     depends_on:
       - kafka
       - payment_db
+      - logstash
     networks:
       - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+          cpus: 0.50
 
   rating-service:
     build:
@@ -77,5 +101,11 @@ services:
     depends_on:
       - kafka
       - mongodb
+      - logstash
     networks:
       - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+          cpus: 0.50

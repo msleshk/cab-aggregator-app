@@ -1,0 +1,99 @@
+services:
+  elasticsearch:
+    image: elasticsearch:8.13.4
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+          cpus: 0.50
+
+  logstash:
+    image: logstash:8.11.3
+    container_name: logstash
+    volumes:
+      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    ports:
+      - "5000:5000"
+    networks:
+      - cab-aggregator-app
+    depends_on:
+      - elasticsearch
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+          cpus: 0.50
+
+  kibana:
+    image: kibana:8.11.3
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    networks:
+      - cab-aggregator-app
+    depends_on:
+      - elasticsearch
+    deploy:
+      resources:
+        limits:
+          memory: 1gb
+          cpus: 0.50
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 256mb
+          cpus: 0.25
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - cab-aggregator-app
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    deploy:
+      resources:
+        limits:
+          cpus: 0.2
+          memory: 128m
+
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          cpus: 0.25
+          memory: 256m
+

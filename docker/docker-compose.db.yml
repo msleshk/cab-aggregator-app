@@ -5,8 +5,8 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_USERNAME: ${MONGO_DB_USERNAME}
-      MONGO_PASSWORD: ${MONGO_DB_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_DB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_DB_PASSWORD}
       MONGO_INITDB_DATABASE: rating_db
     volumes:
       - mongodb_data:/data/db
@@ -24,6 +24,11 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb:27017/
     networks:
       - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 256mb
+          cpus: 0.25
 
   passenger_db:
     image: postgres:latest

@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 60s
+
+scrape_configs:
+  - job_name: 'spring-apps'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - passenger-service:8080
+          - driver-service:8084
+          - ride-service:8082
+          - payment-service:8085
+          - rating-service:8083
