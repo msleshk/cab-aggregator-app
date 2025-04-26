@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,7 @@ public interface DriverApi {
 
     @Operation(summary = "Get driver by id ID")
     @GetMapping("/{id}")
-    ResponseEntity<DriverResponse> getDriver(@PathVariable("id") Long id);
+    ResponseEntity<DriverResponse> getDriver(@PathVariable("id") Long id, @RequestHeader HttpHeaders headers);
 
     @Operation(summary = "Get list of all drivers")
     @GetMapping
