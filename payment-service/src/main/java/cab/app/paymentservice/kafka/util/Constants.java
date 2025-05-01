@@ -8,7 +8,7 @@ public class Constants {
     public static final String PASSENGER_BALANCE_TOPIC = "passenger-balance-topic";
     public static final String PAYMENT_TOPIC = "payment-topic";
     public static final String CONTAINER_FACTORY = "kafkaListenerContainerFactory";
-    public static final String TRUSTED_PACKAGES = "cab.app.paymentservice.dto.kafka, com.example.passengerservice.dto.kafka, com.example.driverservice.dto.kafka";
+    public static final String TRUSTED_PACKAGES = "org.springframework.messaging.support, cab.app.paymentservice.dto.kafka, com.example.passengerservice.dto.kafka, com.example.driverservice.dto.kafka";
     private static final String DESERIALIZE_PAYMENT_REQUEST = "cab.app.rideservice.dto.kafka.CreatePayment" +
             ":cab.app.paymentservice.dto.kafka.CreatePaymentRequest";
     private static final String DESERIALIZE_PASSENGER_BALANCE_REQUEST = "com.example.passengerservice.dto.kafka.NewPassengerBalance" +

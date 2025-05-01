@@ -11,7 +11,7 @@ public class Constants {
     public static final String DRIVER_STATUS_TOPIC = "driver-status-update";
     public static final String GROUP_DRIVER = "driver-group";
     public static final String CONTAINER_FACTORY = "kafkaListenerContainerFactory";
-    public static final String TRUSTED_PACKAGES = "com.example.driverservice.dto.kafka, cab.app.rideservice.dto.kafka";
+    public static final String TRUSTED_PACKAGES = "org.springframework.messaging.support, com.example.driverservice.dto.kafka, cab.app.rideservice.dto.kafka";
     public static final String DESERIALIZE_AVG_RATING = "cab.app.ratingservice.dto.response.AverageRating" +
             ":com.example.driverservice.dto.kafka.AverageRatingResponse";
     public static final String DESERIALIZE_NEW_DRIVER_STATUS = "cab.app.rideservice.dto.kafka.UpdateDriverStatus" +
