@@ -30,6 +30,20 @@ services:
           memory: 256mb
           cpus: 0.25
 
+  keycloak_db:
+    image: postgres:latest
+    container_name: keycloak_db
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: keycloak_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - pg_keycloak:/var/lib/postgresql/data
+    networks:
+      - cab-aggregator-app
+
   passenger_db:
     image: postgres:latest
     container_name: passenger_db

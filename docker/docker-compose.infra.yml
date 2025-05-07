@@ -1,4 +1,22 @@
 services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: keycloak
+    command: [ "start-dev", "--http-port=7000"]
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: ${KEYCLOAK_DB_URL}
+      KC_DB_USERNAME: ${DB_USERNAME}
+      KC_DB_PASSWORD: ${DB_PASSWORD}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    ports:
+      - "7000:7000"
+    networks:
+      - cab-aggregator-app
+    depends_on:
+      - keycloak_db
+
   zookeeper:
     image: bitnami/zookeeper:3.9.0
     container_name: zookeeper
