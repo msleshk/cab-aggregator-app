@@ -1,0 +1,111 @@
+services:
+  passenger-service:
+    build:
+      context: ../passenger-service
+      dockerfile: ../passenger-service/Dockerfile
+    container_name: passenger-service
+    expose:
+      - "8080"
+    environment:
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - PASSENGER_DB_URL=${PASSENGER_DB_URL}
+    depends_on:
+      - kafka
+      - passenger_db
+      - logstash
+    networks:
+      - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+          cpus: 0.50
+
+  driver-service:
+    build:
+      context: ../driver-service
+      dockerfile: ../driver-service/Dockerfile
+    container_name: driver-service
+    expose:
+      - "8084"
+    environment:
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DRIVER_DB_URL=${DRIVER_DB_URL}
+    depends_on:
+      - kafka
+      - driver_db
+      - logstash
+    networks:
+      - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+          cpus: 0.50
+
+  ride-service:
+    build:
+      context: ../ride-service
+      dockerfile: ../ride-service/Dockerfile
+    container_name: ride-service
+    expose:
+      - "8082"
+    environment:
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - RIDE_DB_URL=${RIDE_DB_URL}
+    depends_on:
+      - kafka
+      - ride_db
+      - logstash
+    networks:
+      - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+          cpus: 0.50
+
+  payment-service:
+    build:
+      context: ../payment-service
+      dockerfile: ../payment-service/Dockerfile
+    container_name: payment-service
+    expose:
+      - "8085"
+    environment:
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - PAYMENT_DB_URL=${PAYMENT_DB_URL}
+    depends_on:
+      - kafka
+      - payment_db
+      - logstash
+    networks:
+      - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+          cpus: 0.50
+
+  rating-service:
+    build:
+      context: ../rating-service
+      dockerfile: ../rating-service/Dockerfile
+    container_name: rating-service
+    expose:
+      - "8083"
+    depends_on:
+      - kafka
+      - mongodb
+      - logstash
+    networks:
+      - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+          cpus: 0.50

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,5 +41,5 @@ public interface PassengerApi {
 
     @Operation(summary = "Get passenger by ID", description = "Retrieves details of a specific passenger by ID")
     @GetMapping("/{id}")
-    ResponseEntity<PassengerResponse> getPassenger(@PathVariable("id") Long id);
+    ResponseEntity<PassengerResponse> getPassenger(@PathVariable("id") Long id, @RequestHeader HttpHeaders headers);
 }

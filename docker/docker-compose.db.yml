@@ -1,0 +1,87 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_DB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_DB_PASSWORD}
+      MONGO_INITDB_DATABASE: rating_db
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - cab-aggregator-app
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo_express
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_DB_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_DB_PASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb:27017/
+    networks:
+      - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 256mb
+          cpus: 0.25
+
+  passenger_db:
+    image: postgres:latest
+    container_name: passenger_db
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: passenger_db
+    ports:
+      - "5431:5432"
+    volumes:
+      - pg_passenger:/var/lib/postgresql/data
+    networks:
+      - cab-aggregator-app
+
+  driver_db:
+    image: postgres:latest
+    container_name: driver_db
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: driver_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - pg_driver:/var/lib/postgresql/data
+    networks:
+      - cab-aggregator-app
+
+  ride_db:
+    image: postgres:latest
+    container_name: ride_db
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ride_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_ride:/var/lib/postgresql/data
+    networks:
+      - cab-aggregator-app
+
+  payment_db:
+    image: postgres:latest
+    container_name: payment_db
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: payment_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - pg_payment:/var/lib/postgresql/data
+    networks:
+      - cab-aggregator-app
