@@ -7,6 +7,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -24,11 +27,17 @@ public class KafkaProducer {
 
         Message<NewPassengerBalance> message = MessageBuilder
                 .withPayload(passengerBalanceRequest)
+                .setHeader("Authorization", "Bearer " + getJwtToken())
                 .setHeader(KafkaHeaders.TOPIC, PASSENGER_BALANCE_TOPIC)
                 .setHeader("traceId", traceId)
                 .build();
 
         kafkaTemplate.send(message);
+    }
+
+    private String getJwtToken() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ((JwtAuthenticationToken) auth).getToken().getTokenValue();
     }
 
     private String getTraceId() {
