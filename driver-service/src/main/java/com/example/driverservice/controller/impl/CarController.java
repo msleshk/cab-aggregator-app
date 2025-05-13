@@ -8,6 +8,7 @@ import com.example.driverservice.service.CarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -32,18 +33,21 @@ public class CarController implements CarApi {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or hasRole('DRIVER')")
     public ResponseEntity<Void> addCar(CarRequest carRequest) {
         carService.addCar(carRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or hasRole('DRIVER')")
     public ResponseEntity<Void> deleteCar(Long id) {
         carService.deleteCar(id);
         return ResponseEntity.ok().build();
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or hasRole('DRIVER')")
     public ResponseEntity<Void> updateCar(Long id, CarRequest carToUpdate) {
         carService.updateCar(id, carToUpdate);
         return ResponseEntity.ok().build();
