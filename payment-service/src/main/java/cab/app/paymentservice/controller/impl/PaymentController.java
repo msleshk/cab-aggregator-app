@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,17 +21,20 @@ public class PaymentController implements PaymentApi {
     private final PaymentService paymentService;
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> createPayment(CreatePaymentRequest paymentRequest) {
         paymentService.createPayment(paymentRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PASSENGER')")
     public ResponseEntity<PayResponse> payForRide(PayRequest payRequest) {
         return ResponseEntity.ok().body(paymentService.payForRide(payRequest));
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletePayment(Long paymentId) {
         paymentService.deletePayment(paymentId);
         return ResponseEntity.ok().build();
