@@ -1,16 +1,11 @@
 package cab.app.rideservice.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class ResponseList<T> {
-    private List<T> responseList;
+@Builder
+public record ResponseList<T>(
+        List<T> responseList
+) {
 }

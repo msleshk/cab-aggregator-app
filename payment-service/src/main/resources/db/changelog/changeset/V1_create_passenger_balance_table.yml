@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 6
+      author: Maksim Leshko
+      changes:
+        - createTable:
+            tableName: passenger_balance
+            columns:
+              - column:
+                  name: passenger_id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: balance
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: false

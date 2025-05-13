@@ -40,8 +40,6 @@ databaseChangeLog:
               - column:
                   name: final_cost
                   type: DECIMAL(19,2)
-                  constraints:
-                    nullable: false
               - column:
                   name: status
                   type: VARCHAR(50)

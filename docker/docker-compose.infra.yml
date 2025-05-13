@@ -1,0 +1,87 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: keycloak
+    command: [ "start-dev", "--http-port=7000"]
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: ${KEYCLOAK_DB_URL}
+      KC_DB_USERNAME: ${DB_USERNAME}
+      KC_DB_PASSWORD: ${DB_PASSWORD}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    ports:
+      - "7000:7000"
+    networks:
+      - cab-aggregator-app
+    depends_on:
+      - keycloak_db
+
+  zookeeper:
+    image: bitnami/zookeeper:3.9.0
+    container_name: zookeeper
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    ports:
+      - "2181:2181"
+    networks:
+      - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 256mb
+          cpus: 0.25
+
+  kafka:
+    image: bitnami/kafka:3.9.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    networks:
+      - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+          cpus: 0.50
+
+  discovery-service:
+    build:
+      context: ../discovery-service
+      dockerfile: ../discovery-service/Dockerfile
+    container_name: discovery-service
+    ports:
+      - "8761:8761"
+    networks:
+      - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+          cpus: 0.50
+
+  gateway-service:
+    build:
+      context: ../gateway-service
+      dockerfile: ../gateway-service/Dockerfile
+    container_name: gateway-service
+    ports:
+      - "8888:8888"
+    networks:
+      - cab-aggregator-app
+    deploy:
+      resources:
+        limits:
+          memory: 512mb
+          cpus: 0.50

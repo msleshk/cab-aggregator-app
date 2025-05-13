@@ -1,0 +1,16 @@
+version: "3.8"
+
+volumes:
+  prometheus_data:
+  elasticsearch_data:
+  grafana-storage:
+  mongodb_data:
+  pg_passenger:
+  pg_driver:
+  pg_ride:
+  pg_payment:
+  pg_keycloak:
+
+networks:
+  cab-aggregator-app:
+    driver: bridge

@@ -1,7 +1,7 @@
 package com.example.passengerservice.exception.handler;
 
-import com.example.passengerservice.dto.response.ExceptionDto;
-import com.example.passengerservice.dto.response.MultiException;
+import com.example.passengerservice.dto.response.exception.ExceptionDto;
+import com.example.passengerservice.dto.response.exception.MultiException;
 import com.example.passengerservice.exception.EmailAlreadyTakenException;
 import com.example.passengerservice.exception.PassengerNotFoundException;
 import com.example.passengerservice.exception.PhoneNumberAlreadyTakenException;
@@ -18,7 +18,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
     @ExceptionHandler(PassengerNotFoundException.class)
     public ResponseEntity<ExceptionDto> handlePassengerNotFound(PassengerNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ExceptionDto.builder()
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ExceptionDto.builder()
                 .message(ex.getMessage())
                 .build()
         );

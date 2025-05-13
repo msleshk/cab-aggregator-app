@@ -1,6 +1,6 @@
 package cab.app.paymentservice.service.implementation;
 
-import cab.app.paymentservice.dto.request.CreatePaymentRequest;
+import cab.app.paymentservice.dto.kafka.CreatePaymentRequest;
 import cab.app.paymentservice.dto.request.PayRequest;
 import cab.app.paymentservice.dto.response.PayResponse;
 import cab.app.paymentservice.dto.response.PaymentResponse;
@@ -12,6 +12,7 @@ import cab.app.paymentservice.model.enums.PaymentStatus;
 import cab.app.paymentservice.repository.PaymentRepository;
 import cab.app.paymentservice.repository.PromoCodeRepository;
 import cab.app.paymentservice.service.DriverBalanceService;
+import cab.app.paymentservice.service.PassengerBalanceService;
 import cab.app.paymentservice.service.PaymentService;
 import cab.app.paymentservice.util.PaymentMapper;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,26 +33,24 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentMapper paymentMapper;
     private final PromoCodeRepository promoCodeRepository;
     private final DriverBalanceService driverBalanceService;
+    private final PassengerBalanceService passengerBalanceService;
 
     @Override
     @Transactional
     public void createPayment(CreatePaymentRequest paymentRequest) {
-        if (paymentRepository.findByRideId(paymentRequest.getRideId()).isPresent()) {
-            throw new PaymentAlreadyExistException("Payment for this ride already exist!");
-        }
-        BigDecimal finalAmount = paymentRequest.getCost();
-        if (paymentRequest.getPromoCode() != null) {
-            finalAmount = applyPromoCode(paymentRequest.getPromoCode(), finalAmount);
-        }
+        validatePayment(paymentRequest);
         Payment payment = paymentMapper.toEntity(paymentRequest);
 
         payment.setCreatedAt(LocalDateTime.now());
         payment.setStatus(PaymentStatus.PENDING);
-        payment.setFinalCost(finalAmount);
-
-        driverBalanceService.createDriverBalance(payment.getDriverId());
 
         paymentRepository.save(payment);
+    }
+
+    private void validatePayment(CreatePaymentRequest paymentRequest) {
+        if (paymentRepository.findByRideId(paymentRequest.rideId()).isPresent()) {
+            throw new PaymentAlreadyExistException("Payment for this ride already exist!");
+        }
     }
 
     @Override
@@ -65,12 +63,18 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public PayResponse payForRide(PayRequest payRequest) {
-        Payment payment = findPaymentByRideId(payRequest.getRideId());
+        Payment payment = findPaymentByRideId(payRequest.rideId());
 
-        if (!payment.getPassengerId().equals(payRequest.getPassengerId())) {
+        BigDecimal finalAmount = payment.getCost();
+        if (payRequest.promoCode() != null) {
+            finalAmount = applyPromoCode(payRequest.promoCode(), finalAmount);
+        }
+        if (!payment.getPassengerId().equals(payRequest.passengerId())) {
             throw new IllegalArgumentException("Wrong passenger id!");
         }
+        passengerBalanceService.withdrawFromPassengerBalance(payRequest.passengerId(), finalAmount);
         payment.setStatus(PaymentStatus.PAID);
+        payment.setFinalCost(finalAmount);
         paymentRepository.save(payment);
 
         driverBalanceService.increaseDriverBalance(payment.getDriverId(), payment.getCost());
@@ -115,7 +119,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (!promoCode.isActive()) {
             throw new PromoCodeNotActiveException("Promo code is not active");
         }
-        BigDecimal discount = finalAmount.multiply(BigDecimal.valueOf(promoCode.getDiscountAmount()/100));
+        BigDecimal discount = finalAmount.multiply(BigDecimal.valueOf(promoCode.getDiscountAmount() / 100));
         finalAmount = finalAmount.subtract(discount);
         if (finalAmount.compareTo(BigDecimal.ZERO) < 0) {
             finalAmount = BigDecimal.ZERO;

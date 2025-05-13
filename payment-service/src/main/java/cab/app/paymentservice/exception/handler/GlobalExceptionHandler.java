@@ -1,7 +1,7 @@
 package cab.app.paymentservice.exception.handler;
 
-import cab.app.paymentservice.dto.response.ExceptionDto;
-import cab.app.paymentservice.dto.response.MultiException;
+import cab.app.paymentservice.dto.response.exception.ExceptionDto;
+import cab.app.paymentservice.dto.response.exception.MultiException;
 import cab.app.paymentservice.exception.EntityNotFoundException;
 import cab.app.paymentservice.exception.InsufficientBalanceException;
 import cab.app.paymentservice.exception.PaymentAlreadyExistException;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.xml.bind.ValidationException;
 import java.util.HashMap;
 
 @RestControllerAdvice
@@ -37,7 +36,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PaymentAlreadyExistException.class)
     public ResponseEntity<ExceptionDto> handlePaymentAlreadyExistException(PaymentAlreadyExistException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
                 ExceptionDto.builder()
                         .message(ex.getMessage())
                         .build()
