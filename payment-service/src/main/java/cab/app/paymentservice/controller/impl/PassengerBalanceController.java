@@ -7,6 +7,7 @@ import cab.app.paymentservice.service.PassengerBalanceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,6 +23,7 @@ public class PassengerBalanceController implements PassengerBalanceApi {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PASSENGER')")
     public ResponseEntity<Void> depositToPassengerBalance(Long passengerId,
                                                           DepositRequest request) {
         passengerBalanceService.increasePassengerBalance(passengerId, request.amount());

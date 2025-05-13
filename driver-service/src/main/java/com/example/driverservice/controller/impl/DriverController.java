@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -33,6 +34,7 @@ public class DriverController implements DriverApi {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or hasRole('DRIVER')")
     public ResponseEntity<Void> addDriver(DriverRequest driverRequest) {
         log.info("Adding driver with name={}", driverRequest.name());
         driverService.addDriver(driverRequest);
@@ -40,6 +42,7 @@ public class DriverController implements DriverApi {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or hasRole('DRIVER')")
     public ResponseEntity<Void> updateDriver(Long id, DriverRequest driverToUpdate) {
         log.info("Updating driver with id={}", id);
         driverService.updateDriver(id, driverToUpdate);
@@ -47,6 +50,7 @@ public class DriverController implements DriverApi {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or hasRole('DRIVER')")
     public ResponseEntity<Void> deleteDriver(Long id) {
         log.info("Deleting driver with id={}", id);
         driverService.deleteDriver(id);

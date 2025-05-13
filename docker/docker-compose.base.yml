@@ -9,6 +9,7 @@ volumes:
   pg_driver:
   pg_ride:
   pg_payment:
+  pg_keycloak:
 
 networks:
   cab-aggregator-app:

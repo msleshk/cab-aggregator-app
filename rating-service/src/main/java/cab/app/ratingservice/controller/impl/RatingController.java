@@ -10,6 +10,7 @@ import cab.app.ratingservice.service.RatingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -44,18 +45,21 @@ public class RatingController implements RatingApi {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> createRating(RatingRequest ratingRequest) {
         ratingService.addRating(ratingRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> updateRating(String id, RatingToUpdate update) {
         ratingService.updateRating(id, update);
         return ResponseEntity.ok().build();
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteRating(String id) {
         ratingService.deleteRating(id);
         return ResponseEntity.ok().build();

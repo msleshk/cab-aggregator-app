@@ -22,6 +22,16 @@ services:
           memory: 512mb
           cpus: 0.50
 
+  auth-service:
+    build:
+      context: ../passenger-service
+      dockerfile: ../passenger-service/Dockerfile
+    container_name: passenger-service
+    expose:
+      - "8086"
+    networks:
+      - cab-aggregator-app
+
   driver-service:
     build:
       context: ../driver-service

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -20,6 +21,7 @@ public class PassengerController implements PassengerApi {
     private final PassengerService passengerService;
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PASSENGER')")
     public ResponseEntity<Void> addPassenger(PassengerRequest passengerRequest) {
         log.info("Adding passenger with name={}", passengerRequest.name());
         passengerService.addPassenger(passengerRequest);
@@ -27,6 +29,7 @@ public class PassengerController implements PassengerApi {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PASSENGER')")
     public ResponseEntity<Void> deletePassenger(Long id) {
         log.info("Deleting passenger with id={}", id);
         passengerService.deletePassengerById(id);
@@ -34,6 +37,7 @@ public class PassengerController implements PassengerApi {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PASSENGER')")
     public ResponseEntity<Void> updatePassenger(Long id, PassengerRequest passengerRequest) {
         log.info("Updating passenger with id={}", id);
         passengerService.updatePassenger(id, passengerRequest);
